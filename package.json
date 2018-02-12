@@ -1,0 +1,17 @@
+{
+  "name": "ec-wallet",
+  "version": "0.0.1",
+  "description": "The Elipticoin Wallet",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate-protobufs": "pbjs -t json protos/*.proto -o src/protos.json"
+  },
+  "author": "Mason Fischer",
+  "license": "MIT",
+  "dependencies": {
+    "clime": "^0.5.9",
+    "ed25519": "0.0.4",
+    "protobufjs": "^6.8.4"
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "nested": {
+    "elipticoin": {
+      "nested": {
+        "BaseToken": {
+          "methods": {
+            "_Initialize": {
+              "requestType": "Empty",
+              "responseType": "Empty"
+            },
+            "BalanceOf": {
+              "requestType": "Address",
+              "responseType": "Balance"
+            },
+            "Transfer": {
+              "requestType": "TransferArgs",
+              "responseType": "Empty"
+            }
+          }
+        },
+        "Empty": {
+          "fields": {}
+        },
+        "Address": {
+          "fields": {
+            "bytes": {
+              "type": "bytes",
+              "id": 1
+            }
+          }
+        },
+        "TransferArgs": {
+          "fields": {
+            "receiverAddress": {
+              "type": "bytes",
+              "id": 1
+            },
+            "amount": {
+              "type": "uint64",
+              "id": 2
+            }
+          }
+        },
+        "Balance": {
+          "fields": {
+            "amount": {
+              "type": "uint64",
+              "id": 1
+            }
+          }
+        },
+        "Elipticoin": {
+          "methods": {
+            "Call": {
+              "requestType": "FuncAndArgs",
+              "responseType": "ReturnData"
+            }
+          }
+        },
+        "FuncAndArgs": {
+          "fields": {
+            "func": {
+              "type": "string",
+              "id": 1
+            },
+            "args": {
+              "type": "bytes",
+              "id": 2
+            },
+            "publicKey": {
+              "type": "bytes",
+              "id": 3
+            },
+            "signature": {
+              "type": "bytes",
+              "id": 4
+            }
+          }
+        },
+        "ReturnData": {
+          "fields": {
+            "bytes": {
+              "type": "bytes",
+              "id": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}
