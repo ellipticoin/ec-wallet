@@ -36,21 +36,37 @@ export default class extends Command {
       var funcAndArgs = FuncAndArgs.create({
         func: "transfer",
         args: TransferArgs.encode(transferArgs).finish(),
+        publicKey: PUBLIC_KEY,
       });
       const transfer = FuncAndArgs.encode(funcAndArgs).finish();
 
-      var funcAndArgsSigned = FuncAndArgs.encode(
-        FuncAndArgs.create({
+    var test = FuncAndArgs.create({
           func: "transfer",
           args: TransferArgs.encode(transferArgs).finish(),
+          publicKey: PUBLIC_KEY,
           signature: ed25519.Sign(
             FuncAndArgs.encode(funcAndArgs).finish(),
             PRIVATE_KEY,
           ),
+    })
+      console.log(test.signature.toString('hex'))
+      var funcAndArgsSigned = FuncAndArgs.encode(
+        FuncAndArgs.create({
+          func: "transfer",
+          args: TransferArgs.encode(transferArgs).finish(),
           publicKey: PUBLIC_KEY,
+          signature: ed25519.Sign(
+            FuncAndArgs.encode(funcAndArgs).finish(),
+            PRIVATE_KEY,
+          ),
         })
       ).finish();
-      
+      // console.log(FuncAndArgs.encode(funcAndArgs).finish().toString("hex"));
+      console.log("---")
+      console.log(ed25519.Sign(
+               FuncAndArgs.encode(funcAndArgs).finish(),
+               PRIVATE_KEY,
+             ).toString('hex'))
       return funcAndArgsSigned.toString("hex"));
     })
   }

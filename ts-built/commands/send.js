@@ -29,14 +29,25 @@ let default_1 = class default_1 extends clime_1.Command {
             var funcAndArgs = FuncAndArgs.create({
                 func: "transfer",
                 args: TransferArgs.encode(transferArgs).finish(),
+                publicKey: PUBLIC_KEY,
             });
             const transfer = FuncAndArgs.encode(funcAndArgs).finish();
+            var test = FuncAndArgs.create({
+                func: "transfer",
+                args: TransferArgs.encode(transferArgs).finish(),
+                publicKey: PUBLIC_KEY,
+                signature: ed25519.Sign(FuncAndArgs.encode(funcAndArgs).finish(), PRIVATE_KEY),
+            });
+            console.log(test.signature.toString('hex'));
             var funcAndArgsSigned = FuncAndArgs.encode(FuncAndArgs.create({
                 func: "transfer",
                 args: TransferArgs.encode(transferArgs).finish(),
-                signature: ed25519.Sign(FuncAndArgs.encode(funcAndArgs).finish(), PRIVATE_KEY),
                 publicKey: PUBLIC_KEY,
+                signature: ed25519.Sign(FuncAndArgs.encode(funcAndArgs).finish(), PRIVATE_KEY),
             })).finish();
+            // console.log(FuncAndArgs.encode(funcAndArgs).finish().toString("hex"));
+            console.log("---");
+            console.log(ed25519.Sign(FuncAndArgs.encode(funcAndArgs).finish(), PRIVATE_KEY).toString('hex'));
             return funcAndArgsSigned.toString("hex");
         });
     }
