@@ -12,69 +12,36 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const request = require("request-promise");
-const cbor = require("cbor");
 const clime_1 = require("clime");
 const client_1 = require("../elipticoin/client");
+const request = require("request-promise");
 const ed25519 = require('ed25519');
+const cbor = require("cbor");
+const nacl = require("tweetnacl");
 let default_1 = class default_1 extends clime_1.Command {
-    execute(amount, receiver) {
-        // const receiverAddress = new Buffer(receiver, 'base64');
-        // const rpc_call = cbor.encode({
-        //   method: "transfer",
-        //   params: [
-        //     receiverAddress,
-        //     amount,
-        //   ]
-        // });
-        //
-        // const nonce = toBytesInt32(0);
-        // const message = Buffer.concat([
-        //   PUBLIC_KEY,
-        //   nonce,
-        //   BASE_CONTRACT_ADDRESS,
-        //   rpc_call,
-        // ]);
-        //
-        // const body = Buffer.concat([
-        //   ed25519.Sign(message, PRIVATE_KEY),
-        //   message
-        // ]);
-        //
-        // return request({
-        //   url: ELIPITCOIN_EDGE_SERVER,
-        //   method: "POST",
-        //   encoding: null,
-        //   body,
-        // })
+    execute(address) {
         const client = client_1.default.fromConfig();
+        address = address || client.publicKey;
         return client.call({
-            method: "transfer",
+            method: "balance_of",
             params: [
-                new Buffer(receiver, 'base64'),
-                amount,
+                address
             ]
-        }).then(() => {
-            return `Transferred ${amount} to ${receiver}`;
-        });
+        }).then((balance) => `Balance of ${client.publicKey.toString('base64')}\n${balance}`);
     }
 };
 __decorate([
     __param(0, clime_1.param({
-        description: 'the amount of tokens you\'d like to send',
-        required: true,
-    })),
-    __param(1, clime_1.param({
-        description: 'the address you\'d like to send the tokens to',
-        required: true,
+        description: 'Address',
+        required: false,
     })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({
-        description: 'Send Elipticoins',
+        description: 'Elipticoin Client',
     })
 ], default_1);
 exports.default = default_1;

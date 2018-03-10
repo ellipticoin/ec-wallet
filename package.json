@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "The Elipticoin Wallet",
   "main": "index.js",
+  "bin" : { "ec-wallet" : "./ts-built/cli.js" },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate-protobufs": "pbjs -t json protos/*.proto -o src/protos.json"
@@ -10,8 +11,15 @@
   "author": "Mason Fischer",
   "license": "MIT",
   "dependencies": {
+    "cbor": "^4.0.0",
     "clime": "^0.5.9",
+    "crypto": "^1.0.1",
     "ed25519": "0.0.4",
-    "protobufjs": "^6.8.4"
+    "js-yaml": "^3.11.0",
+    "mkdirp": "^0.5.1",
+    "protobufjs": "^6.8.4",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2",
+    "tweetnacl": "^1.0.0"
   }
 }

@@ -1,13 +1,22 @@
+const request = require("request-promise");
+const cbor = require("cbor");
 import { load } from "protobufjs";
 import {
   Command,
   command,
   param,
 } from 'clime';
+import {
+  BASE_CONTRACT_ADDRESS,
+  PRIVATE_KEY,
+  PUBLIC_KEY,
+  ELIPITCOIN_EDGE_SERVER,
+
+} from "../constants";
+import Client from "../elipticoin/client";
+import {toBytesInt32} from "../utils";
 const ed25519 = require('ed25519');
 
-const PRIVATE_KEY = new Buffer("2a185960faf3ffa84ff8886e8e2e0f8ba0fff4b91adad23108bfef5204390483b114ed4c88b61b46ff544e9120164cb5dc49a71157c212f76995bf1d6aecab0e", "hex");
-const PUBLIC_KEY = new Buffer("b114ed4c88b61b46ff544e9120164cb5dc49a71157c212f76995bf1d6aecab0e", "hex");
 @command({
   description: 'Send Elipticoins',
 })
@@ -24,50 +33,45 @@ export default class extends Command {
     })
     receiver: string,
   ) {
-    return load("src/protos.json").then(function(root) {
-      const TransferArgs = root.lookupType("elipticoin.TransferArgs");
-      const FuncAndArgs =  root.lookupType("elipticoin.FuncAndArgs");
+    // const receiverAddress = new Buffer(receiver, 'base64');
+    // const rpc_call = cbor.encode({
+    //   method: "transfer",
+    //   params: [
+    //     receiverAddress,
+    //     amount,
+    //   ]
+    // });
+    //
+    // const nonce = toBytesInt32(0);
+    // const message = Buffer.concat([
+    //   PUBLIC_KEY,
+    //   nonce,
+    //   BASE_CONTRACT_ADDRESS,
+    //   rpc_call,
+    // ]);
+    //
+    // const body = Buffer.concat([
+    //   ed25519.Sign(message, PRIVATE_KEY),
+    //   message
+    // ]);
+    //
+    // return request({
+    //   url: ELIPITCOIN_EDGE_SERVER,
+    //   method: "POST",
+    //   encoding: null,
+    //   body,
+  // })
+    const client = Client.fromConfig();
 
-      const transferArgs = TransferArgs.create({
-        amount: 1,
-        receiverAddress: new Buffer(receiver, 'base64'),
-      });
-
-      var funcAndArgs = FuncAndArgs.create({
-        func: "transfer",
-        args: TransferArgs.encode(transferArgs).finish(),
-        publicKey: PUBLIC_KEY,
-      });
-      const transfer = FuncAndArgs.encode(funcAndArgs).finish();
-
-    var test = FuncAndArgs.create({
-          func: "transfer",
-          args: TransferArgs.encode(transferArgs).finish(),
-          publicKey: PUBLIC_KEY,
-          signature: ed25519.Sign(
-            FuncAndArgs.encode(funcAndArgs).finish(),
-            PRIVATE_KEY,
-          ),
+    return client.call({
+      method: "transfer",
+      params: [
+        new Buffer(receiver, 'base64'),
+        amount,
+      ]
+    }).then(() => {
+      return `Transferred ${amount} to ${receiver}`
     })
-      console.log(test.signature.toString('hex'))
-      var funcAndArgsSigned = FuncAndArgs.encode(
-        FuncAndArgs.create({
-          func: "transfer",
-          args: TransferArgs.encode(transferArgs).finish(),
-          publicKey: PUBLIC_KEY,
-          signature: ed25519.Sign(
-            FuncAndArgs.encode(funcAndArgs).finish(),
-            PRIVATE_KEY,
-          ),
-        })
-      ).finish();
-      // console.log(FuncAndArgs.encode(funcAndArgs).finish().toString("hex"));
-      console.log("---")
-      console.log(ed25519.Sign(
-               FuncAndArgs.encode(funcAndArgs).finish(),
-               PRIVATE_KEY,
-             ).toString('hex'))
-      return funcAndArgsSigned.toString("hex"));
-    })
+
   }
 }

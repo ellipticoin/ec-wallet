@@ -10,11 +10,10 @@ import {
 export default class extends Command {
   execute(
     @param({
-      description: 'Your loud name',
+      description: 'Elipticoin client',
       required: true,
     })
     name: string,
   ) {
-    return `Hello, ${name}!`;
   }
 }
