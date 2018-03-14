@@ -1,5 +1,5 @@
 const {
-  WORD_FILE_PATH
+  WORDS_FILE_PATH
 } = require("./constants");
 const fs = require("fs");
 
@@ -47,6 +47,6 @@ export function humanReadableAddress(address) {
 
 function readWords() {
   return fs
-    .readFileSync(WORD_FILE_PATH, "utf8")
+    .readFileSync(WORDS_FILE_PATH, "utf8")
     .split("\n")
 }

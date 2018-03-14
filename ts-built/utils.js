@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const { WORD_FILE_PATH } = require("./constants");
+const { WORDS_FILE_PATH } = require("./constants");
 const fs = require("fs");
 function toBytesInt32(num) {
     var arr = new ArrayBuffer(4);
@@ -45,6 +45,6 @@ function humanReadableAddress(address) {
 exports.humanReadableAddress = humanReadableAddress;
 function readWords() {
     return fs
-        .readFileSync(WORD_FILE_PATH, "utf8")
+        .readFileSync(WORDS_FILE_PATH, "utf8")
         .split("\n");
 }
