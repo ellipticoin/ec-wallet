@@ -47,6 +47,6 @@ export function humanReadableAddress(address) {
 
 function readWords() {
   return fs
-    .readFileSync("./config/english.txt", 'utf8')
+    .readFileSync(WORD_FILE_PATH, "utf8")
     .split("\n")
 }
