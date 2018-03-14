@@ -25,7 +25,6 @@ let default_1 = class default_1 extends clime_1.Command {
             const seed = crypto.randomBytes(32);
             const { publicKey, privateKey } = ed25519.MakeKeypair(seed);
             const client = new Client({ privateKey });
-            client.call("constructor", [100]).catch(retry);
             client.call("register").catch(retry);
             return { publicKey, privateKey };
         }).then(({ publicKey, privateKey }) => {
