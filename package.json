@@ -1,6 +1,6 @@
 {
   "name": "ec-wallet",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The Elipticoin Wallet",
   "main": "index.js",
   "bin": {
