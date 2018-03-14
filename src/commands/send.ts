@@ -10,7 +10,7 @@ import {
   BASE_CONTRACT_ADDRESS,
   PRIVATE_KEY,
   PUBLIC_KEY,
-  ELIPITCOIN_EDGE_SERVER,
+  ELIPITCOIN_SEED_EDGE_SERVERS,
 
 } from "../constants";
 import Client from "../elipticoin/client";

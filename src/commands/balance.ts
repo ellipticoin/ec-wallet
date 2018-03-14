@@ -7,12 +7,15 @@ import {
   BASE_CONTRACT_ADDRESS,
   CONFIG_DIR,
   CONFIG_PATH,
-  ELIPITCOIN_EDGE_SERVER,
+  ELIPITCOIN_SEED_EDGE_SERVERS,
   PRIVATE_KEY,
   PUBLIC_KEY,
 } from "../constants";
 import Client from "../elipticoin/client";
-import {toBytesInt32} from "../utils";
+const {
+  toBytesInt32,
+  humanReadableAddress,
+} = require("../utils");
 
 const request = require("request-promise");
 const ed25519 = require('ed25519');
@@ -23,7 +26,7 @@ const nacl = require("tweetnacl");
   description: 'Elipticoin Client',
 })
 export default class extends Command {
-  execute(
+  async execute(
     @param({
       description: 'Address',
       required: false,
@@ -32,15 +35,16 @@ export default class extends Command {
   ) {
     const client = Client.fromConfig();
 
-    address = address || client.publicKey;
-
-    return client.call({
-      method: "balance_of",
-      params: [
-        address
-      ]
-    }).then((balance) =>
-      `Balance of ${client.publicKey.toString('base64')}\n${balance}`
-    );
+    return client.resolveAddress(address)
+      .then((addressBuffer) => {
+        return client.call({
+          method: "balance_of",
+          params: [
+            addressBuffer,
+          ]
+        }).then((balance) =>
+          `Balance of ${humanReadableAddress(addressBuffer)}\n${balance}`
+        );
+      })
   }
 }

@@ -25,7 +25,24 @@ class Client {
         // For now just send transactions directly to the seed nodes
         return _.sample(constants_1.ELIPITCOIN_SEED_EDGE_SERVERS);
     }
-    call({ method, params, }) {
+    async resolveAddress(address) {
+        if (address && address.endsWith("=")) {
+            return new Buffer(address, "base64");
+        }
+        else if (address) {
+            return this.call({
+                method: "lookup",
+                params: [utils_1.humanReadableAddressToU32Bytes(address)]
+            });
+        }
+        else {
+            return this.call({
+                method: "lookup",
+                params: [utils_1.humanReadableAddressToU32Bytes(this.publicKey)]
+            });
+        }
+    }
+    call({ method, params = [], }) {
         const rpc_call = cbor.encode({
             method,
             params,

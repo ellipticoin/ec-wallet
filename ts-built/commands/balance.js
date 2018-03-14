@@ -14,20 +14,23 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const clime_1 = require("clime");
 const client_1 = require("../elipticoin/client");
+const { toBytesInt32, humanReadableAddress, } = require("../utils");
 const request = require("request-promise");
 const ed25519 = require('ed25519');
 const cbor = require("cbor");
 const nacl = require("tweetnacl");
 let default_1 = class default_1 extends clime_1.Command {
-    execute(address) {
+    async execute(address) {
         const client = client_1.default.fromConfig();
-        address = address || client.publicKey;
-        return client.call({
-            method: "balance_of",
-            params: [
-                address
-            ]
-        }).then((balance) => `Balance of ${client.publicKey.toString('base64')}\n${balance}`);
+        return client.resolveAddress(address)
+            .then((addressBuffer) => {
+            return client.call({
+                method: "balance_of",
+                params: [
+                    addressBuffer,
+                ]
+            }).then((balance) => `Balance of ${humanReadableAddress(addressBuffer)}\n${balance}`);
+        });
     }
 };
 __decorate([
@@ -37,7 +40,7 @@ __decorate([
     })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({

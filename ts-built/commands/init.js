@@ -9,23 +9,34 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const constants_1 = require("../constants");
 const clime_1 = require("clime");
+const Client = require("../elipticoin/client").default;
 const yaml = require("js-yaml");
 const mkdirp = require("mkdirp");
 const ed25519 = require("ed25519");
 const crypto = require("crypto");
 const fs = require("fs");
+const promiseRetry = require('promise-retry');
+const { CONFIG_DIR, CONFIG_PATH, } = require("../constants");
+const { humanReadableAddress, fromBytesInt32, } = require("../utils");
 let default_1 = class default_1 extends clime_1.Command {
     execute() {
-        const seed = crypto.randomBytes(32);
-        const { publicKey, privateKey } = ed25519.MakeKeypair(seed);
-        console.log(`Creating ${constants_1.CONFIG_PATH}`);
-        mkdirp(constants_1.CONFIG_DIR);
-        fs.writeFileSync(constants_1.CONFIG_PATH, yaml.safeDump({
-            privateKey: privateKey.toString("base64")
-        }));
-        return `Initialization done. Your elipticoin address is ${publicKey.toString('base64')}`;
+        return promiseRetry((retry, attemptNumber) => {
+            const seed = crypto.randomBytes(32);
+            const { publicKey, privateKey } = ed25519.MakeKeypair(seed);
+            const client = new Client({ privateKey });
+            client.call({
+                "method": "register",
+            }).catch(retry);
+            return { publicKey, privateKey };
+        }).then(({ publicKey, privateKey }) => {
+            console.log(`Creating ${CONFIG_PATH}`);
+            mkdirp(CONFIG_DIR);
+            fs.writeFileSync(CONFIG_PATH, yaml.safeDump({
+                privateKey: privateKey.toString("base64")
+            }));
+            return `Initialization done. Your elipticoin address is ${humanReadableAddress(publicKey)}`;
+        });
     }
 };
 __decorate([

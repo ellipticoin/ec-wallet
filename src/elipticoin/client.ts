@@ -3,7 +3,11 @@ import {
   BASE_CONTRACT_ADDRESS,
   ELIPITCOIN_SEED_EDGE_SERVERS,
 } from "../constants";
-import {toBytesInt32} from "../utils";
+import {
+  toBytesInt32,
+  fromBytesInt32,
+  humanReadableAddressToU32Bytes,
+} from "../utils";
 const request = require("request-promise");
 const _ = require("lodash");
 const ed25519 = require('ed25519');
@@ -13,6 +17,10 @@ const fs = require("fs");
 const yaml = require("js-yaml");
 
 export default class Client {
+  publicKey: Buffer;
+  privateKey: Buffer;
+  nonce: number;
+
   constructor({privateKey}) {
     this.privateKey = privateKey;
     this.publicKey = new Buffer(nacl.sign.keyPair.fromSecretKey(this.privateKey).publicKey)
@@ -31,9 +39,26 @@ export default class Client {
 
     return _.sample(ELIPITCOIN_SEED_EDGE_SERVERS);
   }
+
+  async resolveAddress(address){
+    if ( address && address.endsWith("=")) {
+      return new Buffer(address, "base64")
+    } else if (address) {
+      return this.call({
+        method: "lookup",
+        params: [humanReadableAddressToU32Bytes(address)]
+      });
+    } else {
+      return this.call({
+        method: "lookup",
+        params: [humanReadableAddressToU32Bytes(this.publicKey)]
+      })
+    }
+  }
+
   call({
     method,
-    params,
+    params=[],
   }) {
       const rpc_call = cbor.encode({
         method,
