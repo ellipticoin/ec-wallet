@@ -31,6 +31,11 @@ export default class extends Command {
       const client = new Client({privateKey});
 
       client.call({
+        "method": "constructor",
+        "params": [100],
+      }).catch(retry)
+
+      client.call({
         "method": "register",
       }).catch(retry)
 

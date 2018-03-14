@@ -23,55 +23,31 @@ const ed25519 = require('ed25519');
 export default class extends Command {
   execute(
     @param({
-      description: 'the amount of tokens you\'d like to send',
-      required: true,
-    })
-    amount: number,
-    @param({
       description: 'the address you\'d like to send the tokens to',
       required: true,
     })
     receiver: string,
+    @param({
+      description: 'the amount of tokens you\'d like to send',
+      required: true,
+    })
+    amount: number,
   ) {
-    // const receiverAddress = new Buffer(receiver, 'base64');
-    // const rpc_call = cbor.encode({
-    //   method: "transfer",
-    //   params: [
-    //     receiverAddress,
-    //     amount,
-    //   ]
-    // });
-    //
-    // const nonce = toBytesInt32(0);
-    // const message = Buffer.concat([
-    //   PUBLIC_KEY,
-    //   nonce,
-    //   BASE_CONTRACT_ADDRESS,
-    //   rpc_call,
-    // ]);
-    //
-    // const body = Buffer.concat([
-    //   ed25519.Sign(message, PRIVATE_KEY),
-    //   message
-    // ]);
-    //
-    // return request({
-    //   url: ELIPITCOIN_EDGE_SERVER,
-    //   method: "POST",
-    //   encoding: null,
-    //   body,
-  // })
     const client = Client.fromConfig();
 
-    return client.call({
-      method: "transfer",
-      params: [
-        new Buffer(receiver, 'base64'),
-        amount,
-      ]
-    }).then(() => {
-      return `Transferred ${amount} to ${receiver}`
-    })
-
+    return client.resolveAddress(receiver)
+      .then((receiverBuffer) => {
+        return client.call({
+          method: "transfer",
+          params: [
+            receiverBuffer,
+            amount * 10000,
+          ]
+        }).then(() => {
+          return `Transferred ${amount} to ${receiver}`
+        }).catch(({statusCode, response}) => {
+          return `Contract error code ${statusCode - 400}: ${response.body.toString()}`;
+        })
+      })
   }
 }

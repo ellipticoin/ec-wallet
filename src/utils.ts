@@ -14,12 +14,15 @@ export function fromBytesInt32 (buffer) {
     return view.getUint32(0, true);
 }
 
+export function formatBalance(balance) {
+  return (balance / 10000).toFixed(4);
+}
 export function humanReadableAddressToU32Bytes(address) {
   let identifiers = address.split("-").reverse();
   let words = readWords();
   let int32Address =  parseInt(identifiers[0]) << 22 |
     words.indexOf(identifiers[1]) << 11 |
-    words.indexOf((identifiers[2])
+    words.indexOf(identifiers[2]);
 
   return new Buffer(toBytesInt32(int32Address));
 }

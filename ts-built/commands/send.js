@@ -18,58 +18,35 @@ const clime_1 = require("clime");
 const client_1 = require("../elipticoin/client");
 const ed25519 = require('ed25519');
 let default_1 = class default_1 extends clime_1.Command {
-    execute(amount, receiver) {
-        // const receiverAddress = new Buffer(receiver, 'base64');
-        // const rpc_call = cbor.encode({
-        //   method: "transfer",
-        //   params: [
-        //     receiverAddress,
-        //     amount,
-        //   ]
-        // });
-        //
-        // const nonce = toBytesInt32(0);
-        // const message = Buffer.concat([
-        //   PUBLIC_KEY,
-        //   nonce,
-        //   BASE_CONTRACT_ADDRESS,
-        //   rpc_call,
-        // ]);
-        //
-        // const body = Buffer.concat([
-        //   ed25519.Sign(message, PRIVATE_KEY),
-        //   message
-        // ]);
-        //
-        // return request({
-        //   url: ELIPITCOIN_EDGE_SERVER,
-        //   method: "POST",
-        //   encoding: null,
-        //   body,
-        // })
+    execute(receiver, amount) {
         const client = client_1.default.fromConfig();
-        return client.call({
-            method: "transfer",
-            params: [
-                new Buffer(receiver, 'base64'),
-                amount,
-            ]
-        }).then(() => {
-            return `Transferred ${amount} to ${receiver}`;
+        return client.resolveAddress(receiver)
+            .then((receiverBuffer) => {
+            return client.call({
+                method: "transfer",
+                params: [
+                    receiverBuffer,
+                    amount * 10000,
+                ]
+            }).then(() => {
+                return `Transferred ${amount} to ${receiver}`;
+            }).catch(({ statusCode, response }) => {
+                return `Contract error code ${statusCode - 400}: ${response.body.toString()}`;
+            });
         });
     }
 };
 __decorate([
     __param(0, clime_1.param({
-        description: 'the amount of tokens you\'d like to send',
-        required: true,
-    })),
-    __param(1, clime_1.param({
         description: 'the address you\'d like to send the tokens to',
         required: true,
     })),
+    __param(1, clime_1.param({
+        description: 'the amount of tokens you\'d like to send',
+        required: true,
+    })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String]),
+    __metadata("design:paramtypes", [String, Number]),
     __metadata("design:returntype", void 0)
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([

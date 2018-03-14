@@ -26,6 +26,10 @@ let default_1 = class default_1 extends clime_1.Command {
             const { publicKey, privateKey } = ed25519.MakeKeypair(seed);
             const client = new Client({ privateKey });
             client.call({
+                "method": "constructor",
+                "params": [100],
+            }).catch(retry);
+            client.call({
                 "method": "register",
             }).catch(retry);
             return { publicKey, privateKey };

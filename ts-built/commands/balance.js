@@ -14,7 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const clime_1 = require("clime");
 const client_1 = require("../elipticoin/client");
-const { toBytesInt32, humanReadableAddress, } = require("../utils");
+const { toBytesInt32, humanReadableAddress, formatBalance, } = require("../utils");
 const request = require("request-promise");
 const ed25519 = require('ed25519');
 const cbor = require("cbor");
@@ -29,7 +29,7 @@ let default_1 = class default_1 extends clime_1.Command {
                 params: [
                     addressBuffer,
                 ]
-            }).then((balance) => `Balance of ${humanReadableAddress(addressBuffer)}\n${balance}`);
+            }).then((balance) => `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`);
         });
     }
 };

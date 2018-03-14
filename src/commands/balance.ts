@@ -15,6 +15,7 @@ import Client from "../elipticoin/client";
 const {
   toBytesInt32,
   humanReadableAddress,
+  formatBalance,
 } = require("../utils");
 
 const request = require("request-promise");
@@ -43,7 +44,7 @@ export default class extends Command {
             addressBuffer,
           ]
         }).then((balance) =>
-          `Balance of ${humanReadableAddress(addressBuffer)}\n${balance}`
+          `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`
         );
       })
   }

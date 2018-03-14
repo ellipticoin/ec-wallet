@@ -31,18 +31,15 @@ class Client {
         }
         else if (address) {
             return this.call({
-                method: "lookup",
-                params: [utils_1.humanReadableAddressToU32Bytes(address)]
+                "method": "lookup",
+                "params": [utils_1.humanReadableAddressToU32Bytes(address)]
             });
         }
         else {
-            return this.call({
-                method: "lookup",
-                params: [utils_1.humanReadableAddressToU32Bytes(this.publicKey)]
-            });
+            return this.publicKey;
         }
     }
-    call({ method, params = [], }) {
+    call({ method, params = new Buffer[0](), }) {
         const rpc_call = cbor.encode({
             method,
             params,
