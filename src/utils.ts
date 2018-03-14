@@ -1,3 +1,6 @@
+const {
+  WORD_FILE_PATH
+} = require("./constants");
 const fs = require("fs");
 
 export function toBytesInt32 (num) {

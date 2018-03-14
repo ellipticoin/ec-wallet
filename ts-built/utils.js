@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const { WORD_FILE_PATH } = require("./constants");
 const fs = require("fs");
 function toBytesInt32(num) {
     var arr = new ArrayBuffer(4);
