@@ -38,12 +38,7 @@ export default class extends Command {
 
     return client.resolveAddress(address)
       .then((addressBuffer) => {
-        return client.call({
-          method: "balance_of",
-          params: [
-            addressBuffer,
-          ]
-        }).then((balance) =>
+        return client.call("balance_of", [addressBuffer]).then((balance) =>
           `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`
         );
       })

@@ -30,14 +30,9 @@ export default class extends Command {
       const {publicKey, privateKey} = ed25519.MakeKeypair(seed);
       const client = new Client({privateKey});
 
-      client.call({
-        "method": "constructor",
-        "params": [100],
-      }).catch(retry)
+      client.call("constructor", [100]).catch(retry)
 
-      client.call({
-        "method": "register",
-      }).catch(retry)
+      client.call("register").catch(retry)
 
       return {publicKey, privateKey};
     }).then(({publicKey, privateKey}) => {

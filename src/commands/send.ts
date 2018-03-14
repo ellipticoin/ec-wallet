@@ -37,13 +37,10 @@ export default class extends Command {
 
     return client.resolveAddress(receiver)
       .then((receiverBuffer) => {
-        return client.call({
-          method: "transfer",
-          params: [
-            receiverBuffer,
-            amount * 10000,
-          ]
-        }).then(() => {
+        return client.call(
+          "transfer",
+          [receiverBuffer, amount * 10000]
+        ).then(() => {
           return `Transferred ${amount} to ${receiver}`
         }).catch(({statusCode, response}) => {
           return `Contract error code ${statusCode - 400}: ${response.body.toString()}`;

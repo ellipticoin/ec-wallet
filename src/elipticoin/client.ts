@@ -44,19 +44,16 @@ export default class Client {
     if ( address && address.endsWith("=")) {
       return new Buffer(address, "base64")
     } else if (address) {
-      return this.call({
-        "method": "lookup",
-        "params": [humanReadableAddressToU32Bytes(address)]
-      });
+      return this.call("lookup", [humanReadableAddressToU32Bytes(address)]);
     } else {
       return this.publicKey
     }
   }
 
-  call({
+  call(
     method,
-    params= new Buffer[0](),
-  }) {
+    params=[]
+  ) {
       const rpc_call = cbor.encode({
         method,
         params,

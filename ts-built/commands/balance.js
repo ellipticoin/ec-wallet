@@ -24,12 +24,7 @@ let default_1 = class default_1 extends clime_1.Command {
         const client = client_1.default.fromConfig();
         return client.resolveAddress(address)
             .then((addressBuffer) => {
-            return client.call({
-                method: "balance_of",
-                params: [
-                    addressBuffer,
-                ]
-            }).then((balance) => `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`);
+            return client.call("balance_of", [addressBuffer]).then((balance) => `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`);
         });
     }
 };
