@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("../constants");
 const utils_1 = require("../utils");
+const libsodium = require('libsodium-wrappers-sumo');
 const request = require("request-promise");
 const _ = require("lodash");
 const ed25519 = require('ed25519');
@@ -12,7 +13,6 @@ const yaml = require("js-yaml");
 class Client {
     constructor({ privateKey }) {
         this.privateKey = privateKey;
-        this.publicKey = new Buffer(nacl.sign.keyPair.fromSecretKey(this.privateKey).publicKey);
         this.nonce = 0;
     }
     static fromConfig() {
@@ -33,23 +33,31 @@ class Client {
             return this.call("lookup", [utils_1.humanReadableAddressToU32Bytes(address)]);
         }
         else {
-            return this.publicKey;
+            return await this.publicKey();
         }
     }
-    call(method, params = []) {
+    async sign(message) {
+        await libsodium.ready;
+        return libsodium.crypto_sign_detached(message, this.privateKey);
+    }
+    async publicKey() {
+        await libsodium.ready;
+        return new Buffer(libsodium.crypto_sign_ed25519_sk_to_pk(this.privateKey));
+    }
+    async call(method, params = []) {
         const rpc_call = cbor.encode({
             method,
             params,
         });
         const nonce = utils_1.toBytesInt32(this.nonce++);
         const message = Buffer.concat([
-            this.publicKey,
+            await this.publicKey(),
             nonce,
             constants_1.BASE_CONTRACT_ADDRESS,
             rpc_call,
         ]);
         const body = Buffer.concat([
-            ed25519.Sign(message, this.privateKey),
+            await this.sign(message),
             message
         ]);
         return request({

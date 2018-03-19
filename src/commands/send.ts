@@ -1,6 +1,5 @@
 const request = require("request-promise");
 const cbor = require("cbor");
-import { load } from "protobufjs";
 import {
   Command,
   command,
