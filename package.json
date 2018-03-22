@@ -1,7 +1,7 @@
 {
   "name": "ec-wallet",
   "version": "0.1.3",
-  "description": "The Elipticoin Wallet",
+  "description": "The Ellipticoin Wallet",
   "main": "index.js",
   "bin": {
     "ec-wallet": "./ts-built/cli.js"
