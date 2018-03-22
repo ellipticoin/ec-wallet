@@ -2,7 +2,7 @@ EC Wallet
 =========
 
 
-The [Elipticoin](https://github.com/elipticoin/elipticoin) wallet.
+The [Ellipticoin](http://www.ellipticoin.org/) wallet.
 
 Usage
 =========
