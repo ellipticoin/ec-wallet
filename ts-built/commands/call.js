@@ -16,13 +16,24 @@ const clime_1 = require("clime");
 const Client = require("../ellipticoin/client").default;
 const fs = require("fs");
 const { humanReadableAddress, fromBytesInt32, } = require("../utils");
+const ADDRESS_REGEXP = /\w+\w+-\d+/;
 let default_1 = class default_1 extends clime_1.Command {
     async execute(address, contractName, method, args) {
-        const client = Client.fromConfig();
-        let addressBuffer = await client.resolveAddress(address);
-        return client.call("call", [addressBuffer, contractName, method, parseInt(args[0])]).then(async (result) => `${address} ${contractName} ${method} ${args.join(" ")}
+        this.client = Client.fromConfig();
+        let addressBuffer = await this.client.resolveAddress(address);
+        return this.client.call("call", [await this.client.publicKey(), contractName, method, await this.coerceArgs(args)]).then(async (result) => `${address} ${contractName} ${method} ${args.join(" ")}
 Result: ${result}
       `);
+    }
+    async coerceArgs(args) {
+        return Promise.all(args.map(async (arg) => {
+            if (arg.match(ADDRESS_REGEXP)) {
+                return await this.client.resolveAddress(arg);
+            }
+            else {
+                return JSON.parse(arg);
+            }
+        }));
     }
 };
 __decorate([

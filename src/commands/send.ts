@@ -41,9 +41,7 @@ export default class extends Command {
           [receiverBuffer, amount * 10000]
         ).then(() => {
           return `Transferred ${amount} to ${receiver}`
-        }).catch(({statusCode, response}) => {
-          return `Contract error code ${statusCode - 400}: ${response.body.toString()}`;
-        })
+        });
       })
   }
 }

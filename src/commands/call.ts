@@ -10,7 +10,8 @@ const fs = require("fs");
 const {
   humanReadableAddress,
   fromBytesInt32,
-} = require("../utils")
+} = require("../utils");
+const ADDRESS_REGEXP = /\w+\w+-\d+/;
 
 @command({
   description: 'Call a smart contract function',
@@ -38,14 +39,24 @@ export default class extends Command {
     })
     args: string[],
   ) {
-    const client = Client.fromConfig();
+    this.client = Client.fromConfig();
 
-    let addressBuffer = await client.resolveAddress(address);
+    let addressBuffer = await this.client.resolveAddress(address);
 
-    return client.call("call", [addressBuffer, contractName, method, parseInt(args[0])]).then(async (result) =>
+    return this.client.call("call", [await this.client.publicKey(), contractName, method, await this.coerceArgs(args)]).then(async (result) =>
       `${address} ${contractName} ${method} ${args.join(" ")}
 Result: ${result}
       `
     )
+  }
+
+  async coerceArgs(args) {
+   return Promise.all(args.map(async (arg) => {
+      if(arg.match(ADDRESS_REGEXP)) {
+        return await this.client.resolveAddress(arg);
+      } else {
+        return JSON.parse(arg);
+      }
+    }))
   }
 }

@@ -89,6 +89,12 @@ export default class Client {
         if(result.length) {
           return cbor.decode(result)
         }
+      }).catch((error) => {
+        if (error.response) {
+          throw `Contract error code ${error.statusCode - 400}: ${error.response.body.toString()}`;
+        } else {
+          throw error;
+        }
       });
     }
 }
