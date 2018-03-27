@@ -13,7 +13,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const clime_1 = require("clime");
-const client_1 = require("../elipticoin/client");
+const client_1 = require("../ellipticoin/client");
 const { toBytesInt32, humanReadableAddress, formatBalance, } = require("../utils");
 const request = require("request-promise");
 const ed25519 = require('ed25519');
@@ -22,10 +22,10 @@ const nacl = require("tweetnacl");
 let default_1 = class default_1 extends clime_1.Command {
     async execute(address) {
         const client = client_1.default.fromConfig();
-        return client.resolveAddress(address)
-            .then((addressBuffer) => {
-            return client.call("balance_of", [addressBuffer]).then((balance) => `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`);
-        });
+        let addressBuffer = await client.resolveAddress(address);
+        let balance = await client.call("balance_of", [addressBuffer]);
+        return `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`;
+        ;
     }
 };
 __decorate([
@@ -39,7 +39,7 @@ __decorate([
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({
-        description: 'Elipticoin Client',
+        description: 'Get account balances',
     })
 ], default_1);
 exports.default = default_1;

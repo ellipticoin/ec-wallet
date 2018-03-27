@@ -12,7 +12,7 @@ import {
   ELIPITCOIN_SEED_EDGE_SERVERS,
 
 } from "../constants";
-import Client from "../elipticoin/client";
+import Client from "../ellipticoin/client";
 import {toBytesInt32} from "../utils";
 const ed25519 = require('ed25519');
 

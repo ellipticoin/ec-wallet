@@ -4,7 +4,7 @@ import {
   metadata,
   param,
 } from 'clime';
-const Client = require("../elipticoin/client").default;
+const Client = require("../ellipticoin/client").default;
 const yaml = require("js-yaml");
 const mkdirp = require("mkdirp");
 const ed25519 = require("ed25519");
@@ -20,7 +20,9 @@ const {
   fromBytesInt32,
 } = require("../utils")
 
-@command()
+@command({
+  description: 'Generate an ec-wallet configuration file',
+})
 export default class extends Command {
   @metadata
   execute() {

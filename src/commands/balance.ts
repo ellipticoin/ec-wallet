@@ -11,7 +11,7 @@ import {
   PRIVATE_KEY,
   PUBLIC_KEY,
 } from "../constants";
-import Client from "../elipticoin/client";
+import Client from "../ellipticoin/client";
 const {
   toBytesInt32,
   humanReadableAddress,
@@ -24,7 +24,7 @@ const cbor = require("cbor");
 const nacl = require("tweetnacl");
 
 @command({
-  description: 'Elipticoin Client',
+  description: 'Get account balances',
 })
 export default class extends Command {
   async execute(
@@ -36,11 +36,10 @@ export default class extends Command {
   ) {
     const client = Client.fromConfig();
 
-    return client.resolveAddress(address)
-      .then((addressBuffer) => {
-        return client.call("balance_of", [addressBuffer]).then((balance) =>
-          `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`
-        );
-      })
+    let addressBuffer = await client.resolveAddress(address);
+    let balance = await client.call("balance_of", [addressBuffer]);
+
+    return `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`
+    );
   }
 }

@@ -8,44 +8,47 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const clime_1 = require("clime");
 const Client = require("../ellipticoin/client").default;
-const yaml = require("js-yaml");
-const mkdirp = require("mkdirp");
-const ed25519 = require("ed25519");
-const crypto = require("crypto");
 const fs = require("fs");
-const promiseRetry = require('promise-retry');
-const { CONFIG_DIR, CONFIG_PATH, } = require("../constants");
 const { humanReadableAddress, fromBytesInt32, } = require("../utils");
 let default_1 = class default_1 extends clime_1.Command {
-    execute() {
-        return promiseRetry((retry, attemptNumber) => {
-            const seed = crypto.randomBytes(32);
-            const { publicKey, privateKey } = ed25519.MakeKeypair(seed);
-            const client = new Client({ privateKey });
-            client.call("register").catch(retry);
-            return { publicKey, privateKey };
-        }).then(({ publicKey, privateKey }) => {
-            console.log(`Creating ${CONFIG_PATH}`);
-            mkdirp(CONFIG_DIR);
-            fs.writeFileSync(CONFIG_PATH, yaml.safeDump({
-                privateKey: privateKey.toString("base64")
-            }));
-            return `Initialization done. Your elipticoin address is ${humanReadableAddress(publicKey)}`;
-        });
+    async execute(address, contractName, method, args) {
+        const client = Client.fromConfig();
+        let addressBuffer = await client.resolveAddress(address);
+        return client.call("call", [addressBuffer, contractName, method, parseInt(args[0])]).then(async (result) => `${address} ${contractName} ${method} ${args.join(" ")}
+Result: ${result}
+      `);
     }
 };
 __decorate([
-    clime_1.metadata,
+    __param(0, clime_1.param({
+        description: 'Address',
+        required: true,
+    })),
+    __param(1, clime_1.param({
+        description: 'Contract',
+        required: true,
+    })),
+    __param(2, clime_1.param({
+        description: 'Function Name',
+        required: true,
+    })),
+    __param(3, clime_1.params({
+        type: String,
+        description: 'Function Parameters',
+    })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [String, String, String, Array]),
+    __metadata("design:returntype", Promise)
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({
-        description: 'Generate an ec-wallet configuration file',
+        description: 'Call a smart contract function',
     })
 ], default_1);
 exports.default = default_1;

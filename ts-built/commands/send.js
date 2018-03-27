@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const request = require("request-promise");
 const cbor = require("cbor");
 const clime_1 = require("clime");
-const client_1 = require("../elipticoin/client");
+const client_1 = require("../ellipticoin/client");
 const ed25519 = require('ed25519');
 let default_1 = class default_1 extends clime_1.Command {
     execute(receiver, amount) {
