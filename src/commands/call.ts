@@ -50,8 +50,7 @@ export default class extends Command {
       await this.coerceArgs(args),
     ]);
 
-    return `${address}/${contractName}.${method}(${args.join(",")})\n=> ${result}`
-    )
+    return `${address}/${contractName}.${method}(${args.join(",")})\n=> ${result}`;
   }
 
   async coerceArgs(args) {

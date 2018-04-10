@@ -7,11 +7,13 @@ import {
 } from 'clime';
 import {
   BASE_CONTRACT_ADDRESS,
+  BASE_CONTRACT_NAME,
   PRIVATE_KEY,
   PUBLIC_KEY,
   ELIPITCOIN_SEED_EDGE_SERVERS,
 
 } from "../constants";
+import Contract from "../ellipticoin/contract";
 import Client from "../ellipticoin/client";
 import {toBytesInt32} from "../utils";
 const ed25519 = require('ed25519');
@@ -35,11 +37,17 @@ export default class extends Command {
     const client = Client.fromConfig();
 
     let receiverBuffer = await client.resolveAddress(receiver);
-    await client.post(
-      "transfer",
-      [receiverBuffer, amount * 10000]
+    const baseToken = Contract(
+      client,
+      BASE_CONTRACT_ADDRESS,
+      BASE_CONTRACT_NAME
     );
-
+    baseToken.transfer(receiverBuffer, amount * 10000);
+    // await client.post(
+    //   "transfer",
+    //   [receiverBuffer, amount * 10000]
+    // );
+    //
     return `Transferred ${amount} to ${receiver}`;
   }
 }

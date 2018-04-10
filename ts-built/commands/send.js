@@ -15,13 +15,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const request = require("request-promise");
 const cbor = require("cbor");
 const clime_1 = require("clime");
+const constants_1 = require("../constants");
+const contract_1 = require("../ellipticoin/contract");
 const client_1 = require("../ellipticoin/client");
 const ed25519 = require('ed25519');
 let default_1 = class default_1 extends clime_1.Command {
     async execute(receiver, amount) {
         const client = client_1.default.fromConfig();
         let receiverBuffer = await client.resolveAddress(receiver);
-        await client.post("transfer", [receiverBuffer, amount * 10000]);
+        const baseToken = contract_1.default(client, constants_1.BASE_CONTRACT_ADDRESS, constants_1.BASE_CONTRACT_NAME);
+        baseToken.transfer(receiverBuffer, amount * 10000);
+        // await client.post(
+        //   "transfer",
+        //   [receiverBuffer, amount * 10000]
+        // );
+        //
         return `Transferred ${amount} to ${receiver}`;
     }
 };

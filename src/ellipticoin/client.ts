@@ -44,7 +44,11 @@ export default class Client {
     if ( address && address.endsWith("=")) {
       return new Buffer(address, "base64")
     } else if (address) {
-      return this.post("lookup", [humanReadableAddressToU32Bytes(address)]);
+      return this.post(
+        BASE_CONTRACT_ADDRESS,
+        BASE_CONTRACT_NAME,
+        "lookup",
+        [humanReadableAddressToU32Bytes(address)]);
     } else {
       return await this.publicKey()
     }
@@ -61,6 +65,8 @@ export default class Client {
   }
 
   async post(
+    contractAddress,
+    contractName,
     method,
     params=[]
   ) {
@@ -70,8 +76,8 @@ export default class Client {
       ]);
 
       const path = [
-        BASE_CONTRACT_ADDRESS.toString("hex"),
-        BASE_CONTRACT_NAME,
+        contractAddress.toString("hex"),
+        contractName,
       ].join("/")
 
       let message = Buffer.concat([new Buffer(path, "utf8"), rpcCall]);

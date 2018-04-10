@@ -13,7 +13,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const clime_1 = require("clime");
+const constants_1 = require("../constants");
 const client_1 = require("../ellipticoin/client");
+const contract_1 = require("../ellipticoin/contract");
 const { toBytesInt32, humanReadableAddress, formatBalance, } = require("../utils");
 const request = require("request-promise");
 const ed25519 = require('ed25519');
@@ -23,9 +25,9 @@ let default_1 = class default_1 extends clime_1.Command {
     async execute(address) {
         const client = client_1.default.fromConfig();
         let addressBuffer = await client.resolveAddress(address);
-        let balance = await client.get("balance_of", [addressBuffer]);
+        const baseToken = contract_1.default(client, constants_1.BASE_CONTRACT_ADDRESS, constants_1.BASE_CONTRACT_NAME);
+        let balance = await baseToken.balanceOf(addressBuffer);
         return `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`;
-        ;
     }
 };
 __decorate([

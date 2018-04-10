@@ -30,7 +30,7 @@ class Client {
             return new Buffer(address, "base64");
         }
         else if (address) {
-            return this.post("lookup", [utils_1.humanReadableAddressToU32Bytes(address)]);
+            return this.post(constants_1.BASE_CONTRACT_ADDRESS, constants_1.BASE_CONTRACT_NAME, "lookup", [utils_1.humanReadableAddressToU32Bytes(address)]);
         }
         else {
             return await this.publicKey();
@@ -44,14 +44,14 @@ class Client {
         await libsodium.ready;
         return new Buffer(libsodium.crypto_sign_ed25519_sk_to_pk(this.privateKey));
     }
-    async post(method, params = []) {
+    async post(contractAddress, contractName, method, params = []) {
         const rpcCall = cbor.encode([
             method,
             params,
         ]);
         const path = [
-            constants_1.BASE_CONTRACT_ADDRESS.toString("hex"),
-            constants_1.BASE_CONTRACT_NAME,
+            contractAddress.toString("hex"),
+            contractName,
         ].join("/");
         let message = Buffer.concat([new Buffer(path, "utf8"), rpcCall]);
         let signature = new Buffer(await this.sign(message));

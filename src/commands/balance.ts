@@ -5,6 +5,7 @@ import {
 } from 'clime';
 import {
   BASE_CONTRACT_ADDRESS,
+  BASE_CONTRACT_NAME,
   CONFIG_DIR,
   CONFIG_PATH,
   ELIPITCOIN_SEED_EDGE_SERVERS,
@@ -12,6 +13,7 @@ import {
   PUBLIC_KEY,
 } from "../constants";
 import Client from "../ellipticoin/client";
+import Contract from "../ellipticoin/contract";
 const {
   toBytesInt32,
   humanReadableAddress,
@@ -35,11 +37,16 @@ export default class extends Command {
     address: string,
   ) {
     const client = Client.fromConfig();
-
     let addressBuffer = await client.resolveAddress(address);
-    let balance = await client.get("balance_of", [addressBuffer]);
 
-    return `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`
+    const baseToken = Contract(
+      client,
+      BASE_CONTRACT_ADDRESS,
+      BASE_CONTRACT_NAME
     );
+
+    let balance = await baseToken.balanceOf(addressBuffer);
+
+    return `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`;
   }
 }
