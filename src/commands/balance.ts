@@ -39,13 +39,13 @@ export default class extends Command {
     const client = Client.fromConfig();
     let addressBuffer = await client.resolveAddress(address);
 
-    const baseToken = Contract(
+    const baseToken = new Contract(
       client,
       BASE_CONTRACT_ADDRESS,
       BASE_CONTRACT_NAME
     );
 
-    let balance = await baseToken.balanceOf(addressBuffer);
+    let balance = await baseToken.get("balance_of", addressBuffer);
 
     return `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`;
   }

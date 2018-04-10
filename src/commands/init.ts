@@ -4,6 +4,7 @@ import {
   metadata,
   param,
 } from 'clime';
+const Contract = require("../ellipticoin/contract").default;
 const Client = require("../ellipticoin/client").default;
 const yaml = require("js-yaml");
 const mkdirp = require("mkdirp");
@@ -12,6 +13,8 @@ const crypto = require("crypto");
 const fs = require("fs");
 const promiseRetry = require('promise-retry');
 const {
+  BASE_CONTRACT_ADDRESS,
+  BASE_CONTRACT_NAME,
   CONFIG_DIR,
   CONFIG_PATH,
 } = require("../constants");
@@ -31,7 +34,13 @@ export default class extends Command {
       const seed = crypto.randomBytes(32);
       const {publicKey, privateKey} = ed25519.MakeKeypair(seed);
       const client = new Client({privateKey});
-      client.post("register").catch(retry)
+      const baseToken = new Contract(
+        client,
+        BASE_CONTRACT_ADDRESS,
+        BASE_CONTRACT_NAME
+      );
+      baseToken.post("constructor", 100 * 10000).catch(retry)
+      baseToken.post("register").catch(retry)
 
       return {publicKey, privateKey};
     }).then(({publicKey, privateKey}) => {

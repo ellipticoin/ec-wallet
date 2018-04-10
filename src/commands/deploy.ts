@@ -1,9 +1,14 @@
+import Contract from "../ellipticoin/contract";
 import {
   Command,
   command,
   metadata,
   param,
 } from 'clime';
+import {
+  BASE_CONTRACT_ADDRESS,
+  BASE_CONTRACT_NAME,
+} from "../constants";
 const Client = require("../ellipticoin/client").default;
 const fs = require("fs");
 const {
@@ -28,10 +33,16 @@ export default class extends Command {
     path: string,
   ) {
     const client = Client.fromConfig();
+    const baseToken = new Contract(
+      client,
+      BASE_CONTRACT_ADDRESS,
+      BASE_CONTRACT_NAME
+    );
 
-    return client.post("deploy", [name, fs.readFileSync(path)]).then(async (result) => {
-      let key = await client.publicKey();
-      return `Deployed to ${humanReadableAddress(key)}/${name}
+    await client.deploy(name, fs.readFileSync(path));
+    let key = await client.publicKey();
+
+    return `Deployed to ${humanReadableAddress(key)}/${name}
 Run functions with \`ec-wallet call ${humanReadableAddress(key)} ${name} <method> <args>\`
         `
 

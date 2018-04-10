@@ -12,39 +12,54 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const contract_1 = require("../ellipticoin/contract");
 const clime_1 = require("clime");
-const constants_1 = require("../constants");
-const Client = require("../ellipticoin/client").default;
+const client_1 = require("../ellipticoin/client");
 const fs = require("fs");
 const { humanReadableAddress, fromBytesInt32, } = require("../utils");
+const ADDRESS_REGEXP = /\w+\w+-\d+/;
 let default_1 = class default_1 extends clime_1.Command {
-    async execute(name, path) {
-        const client = Client.fromConfig();
-        const baseToken = new contract_1.default(client, constants_1.BASE_CONTRACT_ADDRESS, constants_1.BASE_CONTRACT_NAME);
-        await client.deploy(name, fs.readFileSync(path));
-        let key = await client.publicKey();
-        return `Deployed to ${humanReadableAddress(key)}/${name}
-Run functions with \`ec-wallet call ${humanReadableAddress(key)} ${name} <method> <args>\`
-        `;
+    async execute(address, contractName, method, args) {
+        this.client = client_1.default.fromConfig();
+        let addressBuffer = await this.client.resolveAddress(address);
+        let result = await this.client.post(await this.client.publicKey(), contractName, method, await this.coerceArgs(args));
+        ;
+        return `${address}/${contractName}.${method}(${args.join(",")})\n=> ${result}`;
+    }
+    async coerceArgs(args) {
+        return Promise.all(args.map(async (arg) => {
+            if (arg.match(ADDRESS_REGEXP)) {
+                return await this.client.resolveAddress(arg);
+            }
+            else {
+                return JSON.parse(arg);
+            }
+        }));
     }
 };
 __decorate([
     __param(0, clime_1.param({
-        description: 'Contract name',
+        description: 'Address',
         required: true,
     })),
     __param(1, clime_1.param({
-        description: 'WASM file path',
+        description: 'Contract',
         required: true,
     })),
+    __param(2, clime_1.param({
+        description: 'Function Name',
+        required: true,
+    })),
+    __param(3, clime_1.params({
+        type: String,
+        description: 'Function Parameters',
+    })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String, String, String, Array]),
     __metadata("design:returntype", Promise)
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({
-        description: 'Deploy a smart contract',
+        description: 'Call a state-modifying smart contract function',
     })
 ], default_1);
 exports.default = default_1;

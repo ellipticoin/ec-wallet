@@ -1,3 +1,4 @@
+const BigNumber = require('bignumber.js');
 const request = require("request-promise");
 const cbor = require("cbor");
 import {
@@ -32,22 +33,18 @@ export default class extends Command {
       description: 'the amount of tokens you\'d like to send',
       required: true,
     })
-    amount: number,
+    amountString: string,
   ) {
     const client = Client.fromConfig();
 
     let receiverBuffer = await client.resolveAddress(receiver);
-    const baseToken = Contract(
+    const baseToken = new Contract(
       client,
       BASE_CONTRACT_ADDRESS,
       BASE_CONTRACT_NAME
     );
-    baseToken.transfer(receiverBuffer, amount * 10000);
-    // await client.post(
-    //   "transfer",
-    //   [receiverBuffer, amount * 10000]
-    // );
-    //
-    return `Transferred ${amount} to ${receiver}`;
+    let amount = BigNumber(amountString).times(10000).toNumber();
+    baseToken.post("transfer", receiverBuffer, amount);
+    return `Transferred ${amountString} to ${receiver}`;
   }
 }

@@ -7,7 +7,7 @@ import {
 } from "../constants";
 const _ = require("lodash");
 
-class Contract {
+export default class Contract {
   client: Client;
   contractAddress: Buffer;
   contractName: String;
@@ -16,6 +16,15 @@ class Contract {
     this.client = client;
     this.contractAddress = contractAddress;
     this.contractName = contractName;
+  }
+
+  get(method, ...params) {
+    return this.client.post(
+      this.contractAddress,
+      this.contractName,
+      method,
+      params
+    );
   }
 
   post(method, ...params) {
@@ -27,15 +36,3 @@ class Contract {
     );
   }
 }
-
-export default function ContractProxy(client, contractAddress, contractName) {
-
-  let contract = new Contract(client, contractAddress, contractName)
-  return new Proxy(contract, {
-    get: function (receiver, name) {
-      // console.log(arguments)
-      return receiver.post.bind(receiver, _.snakeCase(name));
-    }
-  });
-}
-

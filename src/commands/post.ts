@@ -5,7 +5,7 @@ import {
   param,
   params,
 } from 'clime';
-const Client = require("../ellipticoin/client").default;
+import Client from "../ellipticoin/client";
 const fs = require("fs");
 const {
   humanReadableAddress,
@@ -14,9 +14,11 @@ const {
 const ADDRESS_REGEXP = /\w+\w+-\d+/;
 
 @command({
-  description: 'Call a smart contract function',
+  description: 'Call a state-modifying smart contract function',
 })
 export default class extends Command {
+  client: Client;
+
   async execute(
     @param({
       description: 'Address',
@@ -43,7 +45,7 @@ export default class extends Command {
 
     let addressBuffer = await this.client.resolveAddress(address);
 
-    let result =  await  this.client.post("call", [
+    let result =  await  this.client.post(
       await this.client.publicKey(),
       contractName,
       method,

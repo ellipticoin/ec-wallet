@@ -7,17 +7,11 @@ class Contract {
         this.contractAddress = contractAddress;
         this.contractName = contractName;
     }
+    get(method, ...params) {
+        return this.client.post(this.contractAddress, this.contractName, method, params);
+    }
     post(method, ...params) {
         return this.client.post(this.contractAddress, this.contractName, method, params);
     }
 }
-function ContractProxy(client, contractAddress, contractName) {
-    let contract = new Contract(client, contractAddress, contractName);
-    return new Proxy(contract, {
-        get: function (receiver, name) {
-            // console.log(arguments)
-            return receiver.post.bind(receiver, _.snakeCase(name));
-        }
-    });
-}
-exports.default = ContractProxy;
+exports.default = Contract;

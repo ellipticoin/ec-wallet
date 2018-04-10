@@ -12,6 +12,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const BigNumber = require('bignumber.js');
 const request = require("request-promise");
 const cbor = require("cbor");
 const clime_1 = require("clime");
@@ -20,17 +21,13 @@ const contract_1 = require("../ellipticoin/contract");
 const client_1 = require("../ellipticoin/client");
 const ed25519 = require('ed25519');
 let default_1 = class default_1 extends clime_1.Command {
-    async execute(receiver, amount) {
+    async execute(receiver, amountString) {
         const client = client_1.default.fromConfig();
         let receiverBuffer = await client.resolveAddress(receiver);
-        const baseToken = contract_1.default(client, constants_1.BASE_CONTRACT_ADDRESS, constants_1.BASE_CONTRACT_NAME);
-        baseToken.transfer(receiverBuffer, amount * 10000);
-        // await client.post(
-        //   "transfer",
-        //   [receiverBuffer, amount * 10000]
-        // );
-        //
-        return `Transferred ${amount} to ${receiver}`;
+        const baseToken = new contract_1.default(client, constants_1.BASE_CONTRACT_ADDRESS, constants_1.BASE_CONTRACT_NAME);
+        let amount = BigNumber(amountString).times(10000).toNumber();
+        baseToken.post("transfer", receiverBuffer, amount);
+        return `Transferred ${amountString} to ${receiver}`;
     }
 };
 __decorate([
@@ -43,7 +40,7 @@ __decorate([
         required: true,
     })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Number]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([

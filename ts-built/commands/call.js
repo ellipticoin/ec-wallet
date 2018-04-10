@@ -13,21 +13,22 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const clime_1 = require("clime");
-const Client = require("../ellipticoin/client").default;
+const client_1 = require("../ellipticoin/client");
 const fs = require("fs");
 const { humanReadableAddress, fromBytesInt32, } = require("../utils");
 const ADDRESS_REGEXP = /\w+\w+-\d+/;
 let default_1 = class default_1 extends clime_1.Command {
     async execute(address, contractName, method, args) {
-        this.client = Client.fromConfig();
+        this.client = client_1.default.fromConfig();
         let addressBuffer = await this.client.resolveAddress(address);
-        let result = await this.client.post("call", [
-            await this.client.publicKey(),
-            contractName,
-            method,
-            await this.coerceArgs(args),
-        ]);
-        return `${address}/${contractName}.${method}(${args.join(",")})\n=> ${result}`;
+        // let result =  await  this.client.post("call", [
+        //   await this.client.publicKey(),
+        //   contractName,
+        //   method,
+        //   await this.coerceArgs(args),
+        // ]);
+        //
+        // return `${address}/${contractName}.${method}(${args.join(",")})\n=> ${result}`;
     }
     async coerceArgs(args) {
         return Promise.all(args.map(async (arg) => {

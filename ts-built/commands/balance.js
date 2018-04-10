@@ -25,8 +25,8 @@ let default_1 = class default_1 extends clime_1.Command {
     async execute(address) {
         const client = client_1.default.fromConfig();
         let addressBuffer = await client.resolveAddress(address);
-        const baseToken = contract_1.default(client, constants_1.BASE_CONTRACT_ADDRESS, constants_1.BASE_CONTRACT_NAME);
-        let balance = await baseToken.balanceOf(addressBuffer);
+        const baseToken = new contract_1.default(client, constants_1.BASE_CONTRACT_ADDRESS, constants_1.BASE_CONTRACT_NAME);
+        let balance = await baseToken.get("balance_of", addressBuffer);
         return `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`;
     }
 };

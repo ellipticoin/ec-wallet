@@ -1,3 +1,4 @@
+const BigNumber = require('bignumber.js');
 const {
   WORDS_FILE_PATH
 } = require("./constants");
@@ -18,7 +19,7 @@ export function fromBytesInt32 (buffer) {
 }
 
 export function formatBalance(balance) {
-  return (balance / 10000).toFixed(4);
+  return new BigNumber(balance).div(10000).toFixed(4);
 }
 export function humanReadableAddressToU32Bytes(address) {
   let identifiers = address.split("-").reverse();

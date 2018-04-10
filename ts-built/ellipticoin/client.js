@@ -44,6 +44,40 @@ class Client {
         await libsodium.ready;
         return new Buffer(libsodium.crypto_sign_ed25519_sk_to_pk(this.privateKey));
     }
+    async deploy(contractName, contractCode) {
+        const path = [
+            (await this.publicKey()).toString("hex"),
+            contractName,
+        ].join("/");
+        let message = Buffer.concat([new Buffer(path, "utf8"), contractCode]);
+        let signature = new Buffer(await this.sign(message));
+        let nonce = new Buffer(utils_1.toBytesInt32(this.nonce++));
+        return request({
+            url: this.edgeServer() + "/" + path,
+            method: "PUT",
+            encoding: null,
+            body: contractCode,
+            headers: {
+                "Authorization": [
+                    "Signature",
+                    (await this.publicKey()).toString("hex"),
+                    signature.toString("hex"),
+                    nonce.toString("hex"),
+                ].join(" ")
+            }
+        }).then((result) => {
+            if (result.length) {
+                return cbor.decode(result);
+            }
+        }).catch((error) => {
+            if (error.response) {
+                throw `Contract error: ${error.response.body.toString()}`;
+            }
+            else {
+                throw error;
+            }
+        });
+    }
     async post(contractAddress, contractName, method, params = []) {
         const rpcCall = cbor.encode([
             method,

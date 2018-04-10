@@ -6,5 +6,8 @@
         "target": "ESNext",
         "outDir": "ts-built",
         "rootDir": "src"
-    }
+    },
+    "exclude": [
+      "src/ellipticoin/contract.ts"
+    ]
 }

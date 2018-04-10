@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const BigNumber = require('bignumber.js');
 const { WORDS_FILE_PATH } = require("./constants");
 const fs = require("fs");
 function toBytesInt32(num) {
@@ -17,7 +18,7 @@ function fromBytesInt32(buffer) {
 }
 exports.fromBytesInt32 = fromBytesInt32;
 function formatBalance(balance) {
-    return (balance / 10000).toFixed(4);
+    return new BigNumber(balance).div(10000).toFixed(4);
 }
 exports.formatBalance = formatBalance;
 function humanReadableAddressToU32Bytes(address) {
