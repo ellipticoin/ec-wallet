@@ -25,7 +25,7 @@ let default_1 = class default_1 extends clime_1.Command {
             const seed = crypto.randomBytes(32);
             const { publicKey, privateKey } = ed25519.MakeKeypair(seed);
             const client = new Client({ privateKey });
-            client.call("register").catch(retry);
+            client.post("register").catch(retry);
             return { publicKey, privateKey };
         }).then(({ publicKey, privateKey }) => {
             console.log(`Creating ${CONFIG_PATH}`);

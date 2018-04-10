@@ -29,7 +29,7 @@ export default class extends Command {
   ) {
     const client = Client.fromConfig();
 
-    return client.call("deploy", [name, fs.readFileSync(path)]).then(async (result) => {
+    return client.post("deploy", [name, fs.readFileSync(path)]).then(async (result) => {
       let key = await client.publicKey();
       return `Deployed to ${humanReadableAddress(key)}/${name}
 Run functions with \`ec-wallet call ${humanReadableAddress(key)} ${name} <method> <args>\`

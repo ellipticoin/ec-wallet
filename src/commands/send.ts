@@ -20,7 +20,7 @@ const ed25519 = require('ed25519');
   description: 'Send Elipticoins',
 })
 export default class extends Command {
-  execute(
+  async execute(
     @param({
       description: 'the address you\'d like to send the tokens to',
       required: true,
@@ -34,14 +34,12 @@ export default class extends Command {
   ) {
     const client = Client.fromConfig();
 
-    return client.resolveAddress(receiver)
-      .then((receiverBuffer) => {
-        return client.call(
-          "transfer",
-          [receiverBuffer, amount * 10000]
-        ).then(() => {
-          return `Transferred ${amount} to ${receiver}`
-        });
-      })
+    let receiverBuffer = await client.resolveAddress(receiver);
+    await client.post(
+      "transfer",
+      [receiverBuffer, amount * 10000]
+    );
+
+    return `Transferred ${amount} to ${receiver}`;
   }
 }

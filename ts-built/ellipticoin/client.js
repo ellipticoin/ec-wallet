@@ -30,7 +30,7 @@ class Client {
             return new Buffer(address, "base64");
         }
         else if (address) {
-            return this.call("lookup", [utils_1.humanReadableAddressToU32Bytes(address)]);
+            return this.post("lookup", [utils_1.humanReadableAddressToU32Bytes(address)]);
         }
         else {
             return await this.publicKey();
@@ -44,34 +44,67 @@ class Client {
         await libsodium.ready;
         return new Buffer(libsodium.crypto_sign_ed25519_sk_to_pk(this.privateKey));
     }
-    async call(method, params = []) {
-        const rpc_call = cbor.encode({
+    async post(method, params = []) {
+        const rpcCall = cbor.encode([
             method,
             params,
-        });
-        const nonce = utils_1.toBytesInt32(this.nonce++);
-        const message = Buffer.concat([
-            await this.publicKey(),
-            nonce,
-            constants_1.BASE_CONTRACT_ADDRESS,
-            rpc_call,
         ]);
-        const body = Buffer.concat([
-            await this.sign(message),
-            message
-        ]);
+        const path = [
+            constants_1.BASE_CONTRACT_ADDRESS.toString("hex"),
+            constants_1.BASE_CONTRACT_NAME,
+        ].join("/");
+        let message = Buffer.concat([new Buffer(path, "utf8"), rpcCall]);
+        let signature = new Buffer(await this.sign(message));
+        let nonce = new Buffer(utils_1.toBytesInt32(this.nonce++));
         return request({
-            url: this.edgeServer(),
+            url: this.edgeServer() + "/" + path,
             method: "POST",
             encoding: null,
-            body,
+            body: rpcCall,
+            headers: {
+                "Authorization": [
+                    "Signature",
+                    (await this.publicKey()).toString("hex"),
+                    signature.toString("hex"),
+                    nonce.toString("hex"),
+                ].join(" ")
+            }
         }).then((result) => {
             if (result.length) {
                 return cbor.decode(result);
             }
         }).catch((error) => {
             if (error.response) {
-                throw `Contract error code ${error.statusCode - 400}: ${error.response.body.toString()}`;
+                throw `Contract error: ${error.response.body.toString()}`;
+            }
+            else {
+                throw error;
+            }
+        });
+    }
+    async get(method, params = []) {
+        const rpcCall = cbor.encode([
+            method,
+            params,
+        ]);
+        const path = [
+            constants_1.BASE_CONTRACT_ADDRESS.toString("hex"),
+            constants_1.BASE_CONTRACT_NAME,
+        ].join("/");
+        let message = Buffer.concat([new Buffer(path, "utf8"), rpcCall]);
+        let signature = new Buffer(await this.sign(message));
+        let nonce = new Buffer(utils_1.toBytesInt32(this.nonce++));
+        return request({
+            url: this.edgeServer() + "/" + path + "?" + rpcCall.toString("hex"),
+            method: "GET",
+            encoding: null,
+        }).then((result) => {
+            if (result.length) {
+                return cbor.decode(new Buffer(result));
+            }
+        }).catch((error) => {
+            if (error.response) {
+                throw `Contract error: ${error.response.body.toString()}`;
             }
             else {
                 throw error;

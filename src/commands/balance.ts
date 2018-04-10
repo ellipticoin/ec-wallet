@@ -37,7 +37,7 @@ export default class extends Command {
     const client = Client.fromConfig();
 
     let addressBuffer = await client.resolveAddress(address);
-    let balance = await client.call("balance_of", [addressBuffer]);
+    let balance = await client.get("balance_of", [addressBuffer]);
 
     return `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`
     );

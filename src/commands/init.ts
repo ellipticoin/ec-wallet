@@ -31,7 +31,7 @@ export default class extends Command {
       const seed = crypto.randomBytes(32);
       const {publicKey, privateKey} = ed25519.MakeKeypair(seed);
       const client = new Client({privateKey});
-      client.call("register").catch(retry)
+      client.post("register").catch(retry)
 
       return {publicKey, privateKey};
     }).then(({publicKey, privateKey}) => {

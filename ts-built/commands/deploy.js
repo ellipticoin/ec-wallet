@@ -19,7 +19,7 @@ const { humanReadableAddress, fromBytesInt32, } = require("../utils");
 let default_1 = class default_1 extends clime_1.Command {
     async execute(name, path) {
         const client = Client.fromConfig();
-        return client.call("deploy", [name, fs.readFileSync(path)]).then(async (result) => {
+        return client.post("deploy", [name, fs.readFileSync(path)]).then(async (result) => {
             let key = await client.publicKey();
             return `Deployed to ${humanReadableAddress(key)}/${name}
 Run functions with \`ec-wallet call ${humanReadableAddress(key)} ${name} <method> <args>\`

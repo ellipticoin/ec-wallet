@@ -18,14 +18,11 @@ const clime_1 = require("clime");
 const client_1 = require("../ellipticoin/client");
 const ed25519 = require('ed25519');
 let default_1 = class default_1 extends clime_1.Command {
-    execute(receiver, amount) {
+    async execute(receiver, amount) {
         const client = client_1.default.fromConfig();
-        return client.resolveAddress(receiver)
-            .then((receiverBuffer) => {
-            return client.call("transfer", [receiverBuffer, amount * 10000]).then(() => {
-                return `Transferred ${amount} to ${receiver}`;
-            });
-        });
+        let receiverBuffer = await client.resolveAddress(receiver);
+        await client.post("transfer", [receiverBuffer, amount * 10000]);
+        return `Transferred ${amount} to ${receiver}`;
     }
 };
 __decorate([
@@ -39,7 +36,7 @@ __decorate([
     })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Number]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({

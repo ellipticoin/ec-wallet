@@ -21,9 +21,13 @@ let default_1 = class default_1 extends clime_1.Command {
     async execute(address, contractName, method, args) {
         this.client = Client.fromConfig();
         let addressBuffer = await this.client.resolveAddress(address);
-        return this.client.call("call", [await this.client.publicKey(), contractName, method, await this.coerceArgs(args)]).then(async (result) => `${address} ${contractName} ${method} ${args.join(" ")}
-Result: ${result}
-      `);
+        let result = await this.client.post("call", [
+            await this.client.publicKey(),
+            contractName,
+            method,
+            await this.coerceArgs(args),
+        ]);
+        return `${address}/${contractName}.${method}(${args.join(",")})\n=> ${result}`;
     }
     async coerceArgs(args) {
         return Promise.all(args.map(async (arg) => {

@@ -43,10 +43,14 @@ export default class extends Command {
 
     let addressBuffer = await this.client.resolveAddress(address);
 
-    return this.client.call("call", [await this.client.publicKey(), contractName, method, await this.coerceArgs(args)]).then(async (result) =>
-      `${address} ${contractName} ${method} ${args.join(" ")}
-Result: ${result}
-      `
+    let result =  await  this.client.post("call", [
+      await this.client.publicKey(),
+      contractName,
+      method,
+      await this.coerceArgs(args),
+    ]);
+
+    return `${address}/${contractName}.${method}(${args.join(",")})\n=> ${result}`
     )
   }
 
