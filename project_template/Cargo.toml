@@ -1,0 +1,4 @@
+
+
+[lib]
+crate_type = ["cdylib"]
