@@ -17,16 +17,15 @@ const clime_1 = require("clime");
 const constants_1 = require("../constants");
 const Client = require("../ellipticoin/client").default;
 const fs = require("fs");
-const { humanReadableAddress, fromBytesInt32, } = require("../utils");
+const { humanReadableAddress, fromBytesInt32, coerceArgs, } = require("../utils");
 let default_1 = class default_1 extends clime_1.Command {
-    async execute(name, path) {
+    async execute(name, path, params) {
         const client = Client.fromConfig();
         const baseToken = new contract_1.default(client, constants_1.BASE_CONTRACT_ADDRESS, constants_1.BASE_CONTRACT_NAME);
-        await client.deploy(name, fs.readFileSync(path));
+        await client.deploy(name, fs.readFileSync(path), await coerceArgs(client, params));
         let key = await client.publicKey();
         return `Deployed to ${humanReadableAddress(key)}/${name}
-Run functions with \`ec-wallet call ${humanReadableAddress(key)} ${name} <method> <args>\`
-        `;
+Run functions with \`ec-wallet call ${humanReadableAddress(key)} ${name} <method> <args>\``;
     }
 };
 __decorate([
@@ -38,8 +37,12 @@ __decorate([
         description: 'WASM file path',
         required: true,
     })),
+    __param(2, clime_1.params({
+        type: String,
+        description: 'Function Parameters',
+    })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String, String, Array]),
     __metadata("design:returntype", Promise)
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([

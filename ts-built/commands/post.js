@@ -15,25 +15,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const clime_1 = require("clime");
 const client_1 = require("../ellipticoin/client");
 const fs = require("fs");
-const { humanReadableAddress, fromBytesInt32, } = require("../utils");
-const ADDRESS_REGEXP = /\w+\w+-\d+/;
+const { humanReadableAddress, coerceArgs, fromBytesInt32, } = require("../utils");
 let default_1 = class default_1 extends clime_1.Command {
     async execute(address, contractName, method, args) {
         this.client = client_1.default.fromConfig();
         let addressBuffer = await this.client.resolveAddress(address);
-        let result = await this.client.post(await this.client.publicKey(), contractName, method, await this.coerceArgs(args));
-        ;
-        return `${address}/${contractName}.${method}(${args.join(",")})\n=> ${result}`;
-    }
-    async coerceArgs(args) {
-        return Promise.all(args.map(async (arg) => {
-            if (arg.match(ADDRESS_REGEXP)) {
-                return await this.client.resolveAddress(arg);
-            }
-            else {
-                return JSON.parse(arg);
-            }
-        }));
+        let result = await this.client.post(await this.client.publicKey(), contractName, method, await coerceArgs(this.client, args));
+        let output = "";
+        output += `${address}/${contractName}.${method}(${args.join(",")})`;
+        if (result) {
+            output += `\n=> ${result}`;
+        }
+        return output;
     }
 };
 __decorate([

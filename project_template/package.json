@@ -2,7 +2,8 @@
   "name": "${kebabCaseProjectName}",
   "version": "0.1.0",
   "scripts": {
-    "test": "cargo build --target wasm32-unknown-unknown --release --lib && mocha test"
+    "test": "cargo build --target wasm32-unknown-unknown --release --lib && mocha test",
+    "deploy": "ec-wallet deploy DoublerCoin target/wasm32-unknown-unknown/release/doubler_coin.wasm"
   },
   "dependencies": {
     "wasm-rpc": "0.3.1"

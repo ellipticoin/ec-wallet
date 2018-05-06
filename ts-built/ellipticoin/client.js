@@ -3,10 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("../constants");
 const utils_1 = require("../utils");
 const libsodium = require('libsodium-wrappers-sumo');
-const request = require("request-promise");
+const fetch = require("node-fetch");
 const _ = require("lodash");
 const ed25519 = require('ed25519');
-const cbor = require("cbor");
+const cbor = require("borc");
 const nacl = require("tweetnacl");
 const fs = require("fs");
 const yaml = require("js-yaml");
@@ -30,7 +30,7 @@ class Client {
             return new Buffer(address, "base64");
         }
         else if (address) {
-            return this.post(constants_1.BASE_CONTRACT_ADDRESS, constants_1.BASE_CONTRACT_NAME, "lookup", [utils_1.humanReadableAddressToU32Bytes(address)]);
+            return this.post(constants_1.BASE_CONTRACT_ADDRESS, "HumanReadableNameRegistery", "lookup", [utils_1.humanReadableAddressToU32Bytes(address)]);
         }
         else {
             return await this.publicKey();
@@ -44,20 +44,23 @@ class Client {
         await libsodium.ready;
         return new Buffer(libsodium.crypto_sign_ed25519_sk_to_pk(this.privateKey));
     }
-    async deploy(contractName, contractCode) {
-        const path = [
+    async deploy(contractName, contractCode, params) {
+        const path = "/" + [
             (await this.publicKey()).toString("hex"),
             contractName,
         ].join("/");
-        let message = Buffer.concat([new Buffer(path, "utf8"), contractCode]);
-        let signature = new Buffer(await this.sign(message));
+        let body = cbor.encode({
+            code: contractCode,
+            params,
+        });
         let nonce = new Buffer(utils_1.toBytesInt32(this.nonce++));
-        return request({
-            url: this.edgeServer() + "/" + path,
+        let message = Buffer.concat([new Buffer(path, "utf8"), body, nonce]);
+        let signature = new Buffer(await this.sign(message));
+        return fetch(this.edgeServer() + path, {
             method: "PUT",
-            encoding: null,
-            body: contractCode,
+            body,
             headers: {
+                "Content-Type": "application/cbor",
                 "Authorization": [
                     "Signature",
                     (await this.publicKey()).toString("hex"),
@@ -65,9 +68,10 @@ class Client {
                     nonce.toString("hex"),
                 ].join(" ")
             }
-        }).then((result) => {
-            if (result.length) {
-                return cbor.decode(result);
+        }).then(async (response) => {
+            let arrayBuffer = await response.arrayBuffer();
+            if (arrayBuffer.byteLength) {
+                return cbor.decode(Buffer.from(arrayBuffer));
             }
         }).catch((error) => {
             if (error.response) {
@@ -79,23 +83,22 @@ class Client {
         });
     }
     async post(contractAddress, contractName, method, params = []) {
-        const rpcCall = cbor.encode([
+        const body = cbor.encode({
             method,
             params,
-        ]);
-        const path = [
+        });
+        const path = "/" + [
             contractAddress.toString("hex"),
             contractName,
         ].join("/");
-        let message = Buffer.concat([new Buffer(path, "utf8"), rpcCall]);
-        let signature = new Buffer(await this.sign(message));
         let nonce = new Buffer(utils_1.toBytesInt32(this.nonce++));
-        return request({
-            url: this.edgeServer() + "/" + path,
+        let message = Buffer.concat([new Buffer(path, "utf8"), body, nonce]);
+        let signature = new Buffer(await this.sign(message));
+        return fetch(this.edgeServer() + path, {
             method: "POST",
-            encoding: null,
-            body: rpcCall,
+            body,
             headers: {
+                "Content-Type": "application/cbor",
                 "Authorization": [
                     "Signature",
                     (await this.publicKey()).toString("hex"),
@@ -103,38 +106,35 @@ class Client {
                     nonce.toString("hex"),
                 ].join(" ")
             }
-        }).then((result) => {
-            if (result.length) {
-                return cbor.decode(result);
+        }).then(async (response) => {
+            if (response.status == 500) {
+                throw await response.text();
+            }
+            ;
+            let arrayBuffer = await response.arrayBuffer();
+            if (arrayBuffer.byteLength) {
+                return cbor.decode(Buffer.from(arrayBuffer));
             }
         }).catch((error) => {
-            if (error.response) {
-                throw `Contract error: ${error.response.body.toString()}`;
-            }
-            else {
-                throw error;
-            }
+            throw `Contract error: ${error}`;
         });
     }
-    async get(method, params = []) {
-        const rpcCall = cbor.encode([
+    async get(contractAddress, contractName, method, params = []) {
+        const rpcCall = cbor.encode({
             method,
             params,
-        ]);
-        const path = [
-            constants_1.BASE_CONTRACT_ADDRESS.toString("hex"),
-            constants_1.BASE_CONTRACT_NAME,
+        });
+        const path = "/" + [
+            contractAddress.toString("hex"),
+            contractName,
         ].join("/");
         let message = Buffer.concat([new Buffer(path, "utf8"), rpcCall]);
         let signature = new Buffer(await this.sign(message));
         let nonce = new Buffer(utils_1.toBytesInt32(this.nonce++));
-        return request({
-            url: this.edgeServer() + "/" + path + "?" + rpcCall.toString("hex"),
-            method: "GET",
-            encoding: null,
-        }).then((result) => {
-            if (result.length) {
-                return cbor.decode(new Buffer(result));
+        return fetch(this.edgeServer() + path + "?" + rpcCall.toString("hex")).then(async (response) => {
+            let arrayBuffer = await response.arrayBuffer();
+            if (arrayBuffer.byteLength) {
+                return cbor.decode(Buffer.from(arrayBuffer));
             }
         }).catch((error) => {
             if (error.response) {

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const BigNumber = require('bignumber.js');
 const { WORDS_FILE_PATH } = require("./constants");
 const fs = require("fs");
+const ADDRESS_REGEXP = /\w+\w+-\d+/;
 function toBytesInt32(num) {
     var arr = new ArrayBuffer(4);
     var view = new DataView(arr);
@@ -44,6 +45,17 @@ function humanReadableAddress(address) {
     ].join("-");
 }
 exports.humanReadableAddress = humanReadableAddress;
+async function coerceArgs(client, args) {
+    return Promise.all(args.map(async (arg) => {
+        if (arg.match(ADDRESS_REGEXP)) {
+            return await client.resolveAddress(arg);
+        }
+        else {
+            return JSON.parse(arg);
+        }
+    }));
+}
+exports.coerceArgs = coerceArgs;
 function readWords() {
     return fs
         .readFileSync(WORDS_FILE_PATH, "utf8")

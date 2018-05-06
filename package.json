@@ -15,6 +15,7 @@
   "dependencies": {
     "@types/node": "^9.4.7",
     "bignumber.js": "^6.0.0",
+    "borc": "^2.0.3",
     "cbor": "^4.0.0",
     "clime": "^0.5.9",
     "command-exists": "^1.2.6",
@@ -23,9 +24,8 @@
     "js-yaml": "^3.11.0",
     "libsodium-wrappers-sumo": "^0.7.3",
     "mkdirp": "^0.5.1",
+    "node-fetch": "^2.1.2",
     "promise-retry": "^1.1.1",
-    "request": "^2.83.0",
-    "request-promise": "^4.2.2",
     "utf8": "^3.0.0"
   }
 }

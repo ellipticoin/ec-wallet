@@ -1,5 +1,4 @@
 const BigNumber = require('bignumber.js');
-const request = require("request-promise");
 const cbor = require("cbor");
 import {
   Command,

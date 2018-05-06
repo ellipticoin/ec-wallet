@@ -4,6 +4,7 @@ import {
   command,
   metadata,
   param,
+  params,
 } from 'clime';
 import {
   BASE_CONTRACT_ADDRESS,
@@ -14,6 +15,7 @@ const fs = require("fs");
 const {
   humanReadableAddress,
   fromBytesInt32,
+  coerceArgs,
 } = require("../utils")
 
 @command({
@@ -31,6 +33,11 @@ export default class extends Command {
       required: true,
     })
     path: string,
+    @params({
+      type: String,
+      description: 'Function Parameters',
+    })
+    params: string[],
   ) {
     const client = Client.fromConfig();
     const baseToken = new Contract(
@@ -39,13 +46,10 @@ export default class extends Command {
       BASE_CONTRACT_NAME
     );
 
-    await client.deploy(name, fs.readFileSync(path));
+    await client.deploy(name, fs.readFileSync(path), await coerceArgs(client, params));
     let key = await client.publicKey();
 
     return `Deployed to ${humanReadableAddress(key)}/${name}
-Run functions with \`ec-wallet call ${humanReadableAddress(key)} ${name} <method> <args>\`
-        `
-
-    })
+Run functions with \`ec-wallet call ${humanReadableAddress(key)} ${name} <method> <args>\``
   }
 }

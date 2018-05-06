@@ -3,6 +3,7 @@ const {
   WORDS_FILE_PATH
 } = require("./constants");
 const fs = require("fs");
+const ADDRESS_REGEXP = /\w+\w+-\d+/;
 
 export function toBytesInt32 (num) {
     var arr = new ArrayBuffer(4);
@@ -44,6 +45,16 @@ export function humanReadableAddress(address) {
     words[identifiers[1]],
     identifiers[0]
   ].join("-");
+}
+
+export async function coerceArgs(client, args) {
+  return Promise.all(args.map(async (arg) => {
+    if(arg.match(ADDRESS_REGEXP)) {
+      return await client.resolveAddress(arg);
+    } else {
+      return JSON.parse(arg);
+    }
+  }))
 }
 
 function readWords() {

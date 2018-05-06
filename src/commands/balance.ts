@@ -20,7 +20,6 @@ const {
   formatBalance,
 } = require("../utils");
 
-const request = require("request-promise");
 const ed25519 = require('ed25519');
 const cbor = require("cbor");
 const nacl = require("tweetnacl");
@@ -46,7 +45,6 @@ export default class extends Command {
     );
 
     let balance = await baseToken.get("balance_of", addressBuffer);
-
     return `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`;
   }
 }

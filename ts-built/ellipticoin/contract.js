@@ -8,7 +8,7 @@ class Contract {
         this.contractName = contractName;
     }
     get(method, ...params) {
-        return this.client.post(this.contractAddress, this.contractName, method, params);
+        return this.client.get(this.contractAddress, this.contractName, method, params);
     }
     post(method, ...params) {
         return this.client.post(this.contractAddress, this.contractName, method, params);

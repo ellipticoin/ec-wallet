@@ -44,7 +44,7 @@ return filelist;
 
 function renderTemplateAndCopy (source, destination, templateVars) {
   let contents = fs.readFileSync(source, 'utf8');
-  let renderedContents = _.template(contents)(templateVars));
+  let renderedContents = _.template(contents)(templateVars);
   fs.writeFileSync(destination, renderedContents, 'utf8')
 }
 
@@ -67,11 +67,11 @@ export default class extends Command {
 
     var { stdout, stderr } = await exec(`rustup show`);
 
-    if(!stdout.match(/nightly.*(default)^/) {
+    if(!stdout.match(/nightly.*(default)^/)) {
       `rustup update nightly && rustup default nightly`
     };
 
-    if(!stdout.match(/wasm32-unknown-unknown/) {
+    if(!stdout.match(/wasm32-unknown-unknown/)) {
       `rustup target add wasm32-unknown-unknown`
     };
 
@@ -79,51 +79,52 @@ export default class extends Command {
 
     var projectTemplatePath = path.resolve(path.dirname(require.main.filename), "../project_template");
     const projectName = params[0];
-    fs.mkdirSync(`${_.snakeCase(projectName)}/.cargo`);
-    fs.mkdirSync(`${_.snakeCase(projectName)}/test`);
-    fs.mkdirSync(`${_.snakeCase(projectName)}/test/support`);
+    fs.mkdirSync(`${projectName}/.cargo`);
+    fs.mkdirSync(`${projectName}/tmp`);
+    fs.mkdirSync(`${projectName}/test`);
+    fs.mkdirSync(`${projectName}/test/support`);
     fs.copyFileSync(
       `${projectTemplatePath}/test/support/fake-blockchain.js`,
-      `${_.snakeCase(projectName)}/test/support/fake-blockchain.js`,
+      `${projectName}/test/support/fake-blockchain.js`,
     );
     fs.copyFileSync(
       `${projectTemplatePath}/test/support/utils.js`,
-      `${_.snakeCase(projectName)}/test/support/utils.js`,
+      `${projectName}/test/support/utils.js`,
     );
 
     fs.copyFileSync(
       `${projectTemplatePath}/src/error.rs`,
-      `${_.snakeCase(projectName)}/src/error.rs`,
+      `${projectName}/src/error.rs`,
     );
     fs.copyFileSync(
       `${projectTemplatePath}/.cargo/config`,
-      `${_.snakeCase(projectName)}/.cargo/config`,
+      `${projectName}/.cargo/config`,
     );
     fs.copyFileSync(
       `${projectTemplatePath}/.cargo/config`,
-      `${_.snakeCase(projectName)}/.cargo/config`,
+      `${projectName}/.cargo/config`,
     );
 
     renderTemplateAndCopy(
       `${projectTemplatePath}/src/__project_name__.rs`,
-      `${_.snakeCase(projectName)}/src/${_.snakeCase(projectName)}.rs`,
+      `${projectName}/src/${projectName}.rs`,
       {
-        projectName,
+        projectName: _.upperFirst(_.camelCase(projectName)),
       }
     );
 
     renderTemplateAndCopy(
       `${projectTemplatePath}/src/entry_point.rs`,
-      `${_.snakeCase(projectName)}/src/entry_point.rs`,
+      `${projectName}/src/entry_point.rs`,
       {
-        projectName,
-        snakeCaseProjectName: _.snakeCase(projectName),
+        projectName: _.upperFirst(_.camelCase(projectName)),
+        snakeCaseProjectName: projectName,
       }
     );
 
     renderTemplateAndCopy(
       `${projectTemplatePath}/package.json`,
-      `${_.snakeCase(projectName)}/package.json`,
+      `${projectName}/package.json`,
       {
         kebabCaseProjectName: _.kebabCase(projectName),
       }
@@ -131,40 +132,40 @@ export default class extends Command {
 
     renderTemplateAndCopy(
       `${projectTemplatePath}/test/__project_name__-test.js`,
-      `${_.snakeCase(projectName)}/test/${_.kebabCase(projectName)}-test.js`,
+      `${projectName}/test/${_.kebabCase(projectName)}-test.js`,
       {
-        projectName: projectName,
-        snakeCaseProjectName: _.snakeCase(projectName),
+        projectName: _.upperFirst(_.camelCase(projectName)),
+        snakeCaseProjectName: projectName,
       }
     );
 
     renderTemplateAndCopy(
       `${projectTemplatePath}/src/__project_name___test.rs`,
-      `${_.snakeCase(projectName)}/src/${_.snakeCase(projectName)}_test.rs`,
+      `${projectName}/src/${projectName}_test.rs`,
       {
-        projectName,
+        projectName: _.upperFirst(_.camelCase(projectName)),
+        snakeCaseProjectName: projectName,
       }
     );
 
     renderTemplateAndCopy(
       `${projectTemplatePath}/src/lib.rs`,
-      `${_.snakeCase(projectName)}/src/lib.rs`,
+      `${projectName}/src/lib.rs`,
       {
-        snakeCaseProjectName: _.snakeCase(projectName),
+        snakeCaseProjectName: projectName,
       }
     );
 
 
     let cargoToml = fs.readFileSync(
-      `${_.snakeCase(projectName)}/Cargo.toml`,
+      `${projectName}/Cargo.toml`,
       "utf8"
     )
     fs.writeFileSync(
-      `${_.snakeCase(projectName)}/Cargo.toml`,
+      `${projectName}/Cargo.toml`,
       cargoToml.replace("[dependencies]\n", cargoDependencies),
       "utf8"
     )
-    // recursiveListDirectory()
 
   }
 }

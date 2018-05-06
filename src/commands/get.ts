@@ -14,7 +14,7 @@ const {
 } = require("../utils");
 
 @command({
-  description: 'Call a state-modifying smart contract function',
+  description: 'Call a read only smart contract function',
 })
 export default class extends Command {
   client: Client;
@@ -45,20 +45,13 @@ export default class extends Command {
 
     let addressBuffer = await this.client.resolveAddress(address);
 
-    let result =  await  this.client.post(
+    let result =  await  this.client.get(
       await this.client.publicKey(),
       contractName,
       method,
       await coerceArgs(this.client, args)
     );
 
-    let output = "";
-    output += `${address}/${contractName}.${method}(${args.join(",")})`;
-
-    if(result) {
-      output += `\n=> ${result}`;
-    }
-
-    return output;
+    return `${address}/${contractName}.${method}(${args.join(",")})\n=> ${result}`;
   }
 }

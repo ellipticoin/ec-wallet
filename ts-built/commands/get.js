@@ -12,39 +12,42 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const BigNumber = require('bignumber.js');
-const cbor = require("cbor");
 const clime_1 = require("clime");
-const constants_1 = require("../constants");
-const contract_1 = require("../ellipticoin/contract");
 const client_1 = require("../ellipticoin/client");
-const ed25519 = require('ed25519');
+const fs = require("fs");
+const { humanReadableAddress, coerceArgs, fromBytesInt32, } = require("../utils");
 let default_1 = class default_1 extends clime_1.Command {
-    async execute(receiver, amountString) {
-        const client = client_1.default.fromConfig();
-        let receiverBuffer = await client.resolveAddress(receiver);
-        const baseToken = new contract_1.default(client, constants_1.BASE_CONTRACT_ADDRESS, constants_1.BASE_CONTRACT_NAME);
-        let amount = BigNumber(amountString).times(10000).toNumber();
-        baseToken.post("transfer", receiverBuffer, amount);
-        return `Transferred ${amountString} to ${receiver}`;
+    async execute(address, contractName, method, args) {
+        this.client = client_1.default.fromConfig();
+        let addressBuffer = await this.client.resolveAddress(address);
+        let result = await this.client.get(await this.client.publicKey(), contractName, method, await coerceArgs(this.client, args));
+        return `${address}/${contractName}.${method}(${args.join(",")})\n=> ${result}`;
     }
 };
 __decorate([
     __param(0, clime_1.param({
-        description: 'the address you\'d like to send the tokens to',
+        description: 'Address',
         required: true,
     })),
     __param(1, clime_1.param({
-        description: 'the amount of tokens you\'d like to send',
+        description: 'Contract',
         required: true,
     })),
+    __param(2, clime_1.param({
+        description: 'Function Name',
+        required: true,
+    })),
+    __param(3, clime_1.params({
+        type: String,
+        description: 'Function Parameters',
+    })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String, String, String, Array]),
     __metadata("design:returntype", Promise)
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({
-        description: 'Send Elipticoins',
+        description: 'Call a read only smart contract function',
     })
 ], default_1);
 exports.default = default_1;

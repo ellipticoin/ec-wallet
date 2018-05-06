@@ -17,7 +17,6 @@ const constants_1 = require("../constants");
 const client_1 = require("../ellipticoin/client");
 const contract_1 = require("../ellipticoin/contract");
 const { toBytesInt32, humanReadableAddress, formatBalance, } = require("../utils");
-const request = require("request-promise");
 const ed25519 = require('ed25519');
 const cbor = require("cbor");
 const nacl = require("tweetnacl");

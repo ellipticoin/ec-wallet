@@ -19,7 +19,7 @@ export default class Contract {
   }
 
   get(method, ...params) {
-    return this.client.post(
+    return this.client.get(
       this.contractAddress,
       this.contractName,
       method,

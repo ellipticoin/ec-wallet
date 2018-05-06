@@ -19,6 +19,7 @@ mod error;
 mod ${snakeCaseProjectName}_test;
 #[cfg(not(test))]
 pub mod entry_point;
+#[cfg(not(test))]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 #[cfg(not(test))]
