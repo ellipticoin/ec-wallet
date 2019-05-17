@@ -13,7 +13,7 @@ import {
   PUBLIC_KEY,
 } from "../constants";
 import Client from "../ellipticoin/client";
-import Contract from "../ellipticoin/contract";
+import TokenContract from "../ellipticoin/token_contract";
 const {
   toBytesInt32,
   humanReadableAddress,
@@ -38,13 +38,13 @@ export default class extends Command {
     const client = Client.fromConfig();
     let addressBuffer = await client.resolveAddress(address);
 
-    const baseToken = new Contract(
+    const baseToken = new TokenContract(
       client,
       BASE_CONTRACT_ADDRESS,
       BASE_CONTRACT_NAME
     );
 
-    let balance = await baseToken.get("balance_of", addressBuffer);
+    let balance = await baseToken.balanceOf(addressBuffer);
     return `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`;
   }
 }

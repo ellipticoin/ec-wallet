@@ -18,12 +18,11 @@ export default class Contract {
     this.contractName = contractName;
   }
 
-  get(method, ...params) {
-    return this.client.get(
+  getMemory(key) {
+    return this.client.getMemory(
       this.contractAddress,
       this.contractName,
-      method,
-      params
+      key,
     );
   }
 

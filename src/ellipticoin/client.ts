@@ -8,6 +8,8 @@ import {
   toBytesInt32,
   fromBytesInt32,
   humanReadableAddressToU32Bytes,
+  toKey,
+  base64url,
 } from "../utils";
 const libsodium = require('libsodium-wrappers-sumo');
 const fetch = require("node-fetch");
@@ -22,8 +24,14 @@ export default class Client {
   privateKey: Buffer;
   nonce: number;
 
-  constructor({privateKey}) {
+  constructor({
+    privateKey,
+    contractAddress,
+    contractName,
+  }) {
     this.privateKey = privateKey;
+    this.contractName = contractName;
+    this.contractAddress = contractAddress;
     this.nonce = 0;
   }
 
@@ -154,30 +162,24 @@ export default class Client {
     });
   }
 
-  async get(
+  async getMemory(
     contractAddress,
     contractName,
-    method,
+    key,
     params=[]
   ) {
-    const rpcCall = cbor.encode({
-      method,
-      params,
-    });
-
-    const path = "/" + [
-      contractAddress.toString("hex"),
+    let fullKey = toKey(
+      contractAddress,
       contractName,
-    ].join("/")
+      key
+    );
 
-    let message = Buffer.concat([new Buffer(path, "utf8"), rpcCall]);
-    let signature = new Buffer(await this.sign(message));
-    let nonce = new Buffer(toBytesInt32(this.nonce++));
-
-    return fetch(this.edgeServer() + path + "?" + rpcCall.toString("hex")).then(async (response) => {
+    return fetch(this.edgeServer() + "/memory/" + base64url(fullKey)).then(async (response) => {
       let arrayBuffer = await response.arrayBuffer();
       if(arrayBuffer.byteLength) {
-        return cbor.decode(Buffer.from(arrayBuffer));
+        return arrayBuffer;
+      } else {
+        return null;
       }
     }).catch((error) => {
       if (error.response) {

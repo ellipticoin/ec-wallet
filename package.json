@@ -23,9 +23,13 @@
     "install": "^0.10.4",
     "js-yaml": "^3.11.0",
     "libsodium-wrappers-sumo": "^0.7.3",
+    "lodash": "^4.17.11",
+    "long": "^4.0.0",
     "mkdirp": "^0.5.1",
     "node-fetch": "^2.1.2",
     "promise-retry": "^1.1.1",
+    "source-map-support": "^0.5.12",
+    "tweetnacl": "^1.0.1",
     "utf8": "^3.0.0"
   }
 }
