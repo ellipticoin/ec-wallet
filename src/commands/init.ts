@@ -40,25 +40,13 @@ const baseToken = new Contract(
 export default class extends Command {
   @metadata
   async execute() {
-
-    let {publicKey, privateKey} = await promiseRetry((retry, attemptNumber) => {
-      const seed = crypto.randomBytes(32);
-      const {publicKey, privateKey} = ed25519.MakeKeypair(seed);
-      const client = new Client({privateKey});
-      baseToken.client = client;
-      humanReadableNameRegistery.client = client;
-
-      baseToken.post("constructor", 100 * 10000).catch(retry)
-      humanReadableNameRegistery.post("register").catch(retry)
-
-      return {publicKey, privateKey};
-    })
-
+    const seed = crypto.randomBytes(32);
+    const {publicKey, privateKey} = ed25519.MakeKeypair(seed);
     mkdirp(CONFIG_DIR);
     fs.writeFileSync(CONFIG_PATH, yaml.safeDump({
       privateKey: privateKey.toString("base64")
     }));
 
-    return `Initialization done. Your elipticoin address is ${humanReadableAddress(publicKey)}`
+    return `Initialization done. Your elipticoin address is ${publicKey.toString("base64")}`
   }
 }
