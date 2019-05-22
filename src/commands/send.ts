@@ -36,7 +36,7 @@ export default class extends Command {
   ) {
     const client = Client.fromConfig();
 
-    let receiverBuffer = await client.resolveAddress(receiver);
+    let receiverBuffer = new Buffer(receiver, 'base64');
     const baseToken = new Contract(
       client,
       BASE_CONTRACT_ADDRESS,

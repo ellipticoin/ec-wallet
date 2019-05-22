@@ -45,6 +45,6 @@ export default class extends Command {
     );
 
     let balance = await baseToken.balanceOf(addressBuffer);
-    return `Balance of ${humanReadableAddress(addressBuffer)}\n${formatBalance(balance)}`;
+    return `Balance of ${addressBuffer.toString("base64")}\n${formatBalance(balance)}`;
   }
 }

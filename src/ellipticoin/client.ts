@@ -19,6 +19,7 @@ const cbor = require("borc");
 const nacl = require("tweetnacl");
 const fs = require("fs");
 const yaml = require("js-yaml");
+const path = require('path');
 
 export default class Client {
   privateKey: Buffer;
@@ -120,34 +121,24 @@ export default class Client {
   async post(
     contractAddress,
     contractName,
-    method,
-    params=[]
+    func,
+    args=[]
   ) {
-    const body = cbor.encode({
-      method,
-      params,
-    });
+    const body = {
+      contract_address: contractAddress,
+      sender: await this.publicKey(),
+      nonce: 0,
+      contract_name: contractName,
+      function: func,
+      arguments: args,
+    };
 
-    const path = "/" + [
-      contractAddress.toString("hex"),
-      contractName,
-    ].join("/")
-
-    let nonce = new Buffer(toBytesInt32(this.nonce++));
-    let message = Buffer.concat([new Buffer(path, "utf8"), body, nonce]);
-    let signature = new Buffer(await this.sign(message));
-
-    return fetch(this.edgeServer() + path, {
+    body.signature = new Buffer(await this.sign(cbor.encode(body)));
+    return fetch(this.edgeServer() + "/transactions", {
       method: "POST",
-      body,
+      body: cbor.encode(body),
       headers: {
         "Content-Type": "application/cbor",
-        "Authorization": [
-          "Signature",
-          (await this.publicKey()).toString("hex"),
-          signature.toString("hex"),
-          nonce.toString("hex"),
-        ].join(" ")
       }
     }).then(async (response) => {
       if(response.status == 500) {
