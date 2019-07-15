@@ -1,2 +1,0 @@
-[build.'cfg(not(debug_assertions))']
-target = "wasm32-unknown-unknown"

@@ -12,10 +12,13 @@ export default class Contract {
   contractAddress: Buffer;
   contractName: String;
 
-  constructor(client, contractAddress, contractName) {
-    this.client = client;
+  constructor(contractAddress, contractName) {
     this.contractAddress = contractAddress;
     this.contractName = contractName;
+  }
+
+  setClient(client) {
+    this.client = client;
   }
 
   getMemory(key) {

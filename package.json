@@ -1,14 +1,13 @@
 {
   "name": "ec-wallet",
-  "version": "0.4.3",
+  "version": "0.4.7",
   "description": "The Ellipticoin Wallet",
   "main": "index.js",
   "bin": {
     "ec-wallet": "./ts-built/cli.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "generate-protobufs": "pbjs -t json protos/*.proto -o src/protos.json"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mason Fischer",
   "license": "MIT",
@@ -20,8 +19,7 @@
     "clime": "^0.5.9",
     "command-exists": "^1.2.6",
     "ed25519": "0.0.4",
-    "install": "^0.10.4",
-    "js-yaml": "^3.11.0",
+    "js-yaml": "^3.13.1",
     "libsodium-wrappers-sumo": "^0.7.3",
     "lodash": "^4.17.11",
     "long": "^4.0.0",

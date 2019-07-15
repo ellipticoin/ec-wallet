@@ -1,55 +1,53 @@
-import Contract from "../ellipticoin/contract";
+const BigNumber = require('bignumber.js');
+const cbor = require("cbor");
 import {
   Command,
   command,
-  metadata,
   param,
   params,
 } from 'clime';
 import {
   BASE_CONTRACT_ADDRESS,
   BASE_CONTRACT_NAME,
+  PRIVATE_KEY,
+  PUBLIC_KEY,
+  ELIPITCOIN_SEED_EDGE_SERVERS,
+
 } from "../constants";
-const Client = require("../ellipticoin/client").default;
+import Contract from "../ellipticoin/contract";
+import Client from "../ellipticoin/client";
 const fs = require("fs");
-const {
-  humanReadableAddress,
-  fromBytesInt32,
-  coerceArgs,
-} = require("../utils")
+import {
+  toBytesInt32,
+  coerceArgs
+} from "../utils";
+const ed25519 = require('ed25519');
 
 @command({
-  description: 'Deploy a smart contract',
+  description: 'Deploy a Smart Contract',
 })
 export default class extends Command {
   async execute(
-    @param({
-      description: 'Contract name',
-      required: true,
-    })
-    name: string,
     @param({
       description: 'WASM file path',
       required: true,
     })
     path: string,
+    @param({
+      description: 'Contract name',
+      required: true,
+    })
+    contractName: string,
     @params({
       type: String,
-      description: 'Function Parameters',
+      description: 'Constructor Parameters',
     })
-    params: string[],
+    constructorParams: string[],
   ) {
     const client = Client.fromConfig();
-    const baseToken = new Contract(
-      client,
-      BASE_CONTRACT_ADDRESS,
-      BASE_CONTRACT_NAME
-    );
-
-    await client.deploy(name, fs.readFileSync(path), await coerceArgs(client, params));
+    await client.deploy(contractName, fs.readFileSync(path), await coerceArgs(client, constructorParams));
     let key = await client.publicKey();
 
-    return `Deployed to ${humanReadableAddress(key)}/${name}
-Run functions with \`ec-wallet call ${humanReadableAddress(key)} ${name} <method> <args>\``
+    return `Deployed ${contractName}`;
   }
 }

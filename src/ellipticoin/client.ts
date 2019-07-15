@@ -23,6 +23,8 @@ const path = require('path');
 
 export default class Client {
   privateKey: Buffer;
+  contractAddress: Buffer;
+  contractName: String;
   nonce: number;
 
   constructor({
@@ -38,7 +40,11 @@ export default class Client {
 
   static fromConfig() {
     const privateKey = new Buffer(yaml.safeLoad(fs.readFileSync(CONFIG_PATH)).privateKey, "base64");
-    return new this({privateKey})
+    return new this({
+      contractAddress: null,
+      contractName: null,
+      privateKey,
+    })
   }
 
   edgeServer() {
@@ -78,44 +84,12 @@ export default class Client {
     contractCode,
     params,
   ) {
-    const path = "/" + [
-      (await this.publicKey()).toString("hex"),
-      contractName,
-    ].join("/")
-
-    let body = cbor.encode({
-        code: contractCode,
-        params,
-    });
-
-    let nonce = new Buffer(toBytesInt32(this.nonce++));
-    let message = Buffer.concat([new Buffer(path, "utf8"), body, nonce]);
-    let signature = new Buffer(await this.sign(message));
-
-    return fetch(this.edgeServer() + path, {
-      method: "PUT",
-      body,
-      headers: {
-        "Content-Type": "application/cbor",
-        "Authorization": [
-          "Signature",
-          (await this.publicKey()).toString("hex"),
-          signature.toString("hex"),
-          nonce.toString("hex"),
-        ].join(" ")
-      }
-    }).then(async(response) => {
-      let arrayBuffer = await response.arrayBuffer();
-      if(arrayBuffer.byteLength) {
-        return cbor.decode(Buffer.from(arrayBuffer));
-      }
-    }).catch((error) => {
-      if (error.response) {
-        throw `Contract error: ${error.response.body.toString()}`;
-      } else {
-        throw error;
-      }
-    });
+    return this.post(
+      new Buffer(32),
+      "system",
+      "create_contract",
+      [contractName, contractCode, params]
+    );
   }
 
   async post(
@@ -133,10 +107,13 @@ export default class Client {
       arguments: args,
     };
 
-    body.signature = new Buffer(await this.sign(cbor.encode(body)));
+    const signedBody = cbor.encode({
+      ...body,
+      signature: new Buffer(await this.sign(cbor.encode(body))),
+    });
     return fetch(this.edgeServer() + "/transactions", {
       method: "POST",
-      body: cbor.encode(body),
+      body: signedBody,
       headers: {
         "Content-Type": "application/cbor",
       }

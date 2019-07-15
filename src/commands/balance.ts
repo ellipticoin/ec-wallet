@@ -30,21 +30,33 @@ const nacl = require("tweetnacl");
 export default class extends Command {
   async execute(
     @param({
+      description: 'Token Contract Address/Ticker',
+      required: true,
+    })
+    token: string,
+    @param({
       description: 'Address',
-      required: false,
+      required: true,
     })
     address: string,
   ) {
     const client = Client.fromConfig();
-    let addressBuffer = await client.resolveAddress(address);
-
-    const baseToken = new TokenContract(
-      client,
-      BASE_CONTRACT_ADDRESS,
-      BASE_CONTRACT_NAME
-    );
-
-    let balance = await baseToken.balanceOf(addressBuffer);
+    let addressBuffer = new Buffer(address, "base64")
+    let tokenContract = tokenContractFromString(token);
+    tokenContract.setClient(client);
+    let balance = await tokenContract.balanceOf(addressBuffer);
     return `Balance of ${addressBuffer.toString("base64")}\n${formatBalance(balance)}`;
+  }
+}
+
+function tokenContractFromString(tokenString) {
+  let tokens = {
+    "EC": new TokenContract(new Buffer(32), "BaseToken")
+  }
+  if(tokens[tokenString]) {
+    return tokens[tokenString];
+  } else {
+    let [address, contractName] = tokenString.split(":");
+    return new TokenContract(new Buffer(address, "base64"), contractName)
   }
 }

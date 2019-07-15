@@ -87,14 +87,14 @@ function stringToBytes(string) {
   return new Buffer(string, 'utf8');
 }
 
-function padRight(bytes, number) {
+function padRight(bytes) {
   let padded = new Uint8Array(32);
   padded.set(bytes);
   return padded;
 }
 
 export function base64url(bytes) {
-  return (new Buffer.from(bytes))
+  return (Buffer.from(bytes))
     .toString("base64")
     .replace(/\+/g, "-")
     .replace(/\//g, "_");

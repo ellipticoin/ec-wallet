@@ -38,10 +38,10 @@ export default class extends Command {
 
     let receiverBuffer = new Buffer(receiver, 'base64');
     const baseToken = new Contract(
-      client,
       BASE_CONTRACT_ADDRESS,
       BASE_CONTRACT_NAME
     );
+    baseToken.client = client;
     let amount = BigNumber(amountString).times(10000).toNumber();
     baseToken.post("transfer", receiverBuffer, amount);
     return `Transferred ${amountString} to ${receiver}`;
