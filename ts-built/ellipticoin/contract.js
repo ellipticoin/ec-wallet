@@ -12,8 +12,8 @@ class Contract {
     getMemory(key) {
         return this.client.getMemory(this.contractAddress, this.contractName, key);
     }
-    post(method, ...params) {
-        return this.client.post(this.contractAddress, this.contractName, method, params);
+    post(func, ...args) {
+        return this.client.post(this.contractAddress, this.contractName, func, ...args);
     }
 }
 exports.default = Contract;

@@ -29,12 +29,12 @@ export default class Contract {
     );
   }
 
-  post(method, ...params) {
+  post(func, ...args) {
     return this.client.post(
       this.contractAddress,
       this.contractName,
-      method,
-      params
+      func,
+      ...args
     );
   }
 }

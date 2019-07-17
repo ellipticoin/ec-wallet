@@ -4,6 +4,9 @@ const contract_1 = require("./contract");
 const utils_1 = require("../utils");
 const BALANCE_KEY = new Buffer([0]);
 class TokenContract extends contract_1.default {
+    async transfer(recipientAddress, amount) {
+        this.post("transfer", [recipientAddress, amount]);
+    }
     async balanceOf(address) {
         let balanceBytes = await this.getMemory(Buffer.concat([BALANCE_KEY, address]));
         if (balanceBytes) {

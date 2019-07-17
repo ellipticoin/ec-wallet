@@ -76,17 +76,17 @@ exports.bytesToNumber = bytesToNumber;
 function toKey(address, contractName, key) {
     return Buffer.concat([
         Buffer.from(address),
-        Buffer.from(padRight(stringToBytes(contractName))),
+        padRight(stringToBytes(contractName)),
         Buffer.from(key)
     ]);
 }
 exports.toKey = toKey;
-function stringToBytes(string) {
-    return new Buffer(string, 'utf8');
+function stringToBytes(s) {
+    return new Buffer(s, 'utf8');
 }
 function padRight(bytes) {
     let padded = new Uint8Array(32);
-    padded.set(bytes);
+    padded.set(Uint8Array.from(bytes));
     return padded;
 }
 function base64url(bytes) {

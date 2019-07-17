@@ -5,6 +5,9 @@ import {
 const BALANCE_KEY = new Buffer([0]);
 
 export default class TokenContract extends Contract {
+  async transfer (recipientAddress, amount) {
+    this.post("transfer", [recipientAddress, amount]);
+  }
   async balanceOf (address) {
     let balanceBytes = await this.getMemory(Buffer.concat([BALANCE_KEY, address]));
 
