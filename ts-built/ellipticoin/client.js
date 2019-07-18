@@ -5,7 +5,6 @@ const utils_1 = require("../utils");
 const libsodium = require('libsodium-wrappers-sumo');
 const fetch = require("node-fetch");
 const _ = require("lodash");
-const ed25519 = require('ed25519');
 const cbor = require("borc");
 const nacl = require("tweetnacl");
 const fs = require("fs");

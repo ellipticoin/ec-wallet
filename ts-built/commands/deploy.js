@@ -18,7 +18,6 @@ const clime_1 = require("clime");
 const client_1 = require("../ellipticoin/client");
 const fs = require("fs");
 const utils_1 = require("../utils");
-const ed25519 = require('ed25519');
 let default_1 = class default_1 extends clime_1.Command {
     async execute(path, contractName, constructorParams) {
         const client = client_1.default.fromConfig();

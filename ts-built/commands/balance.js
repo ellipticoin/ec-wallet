@@ -16,7 +16,6 @@ const clime_1 = require("clime");
 const client_1 = require("../ellipticoin/client");
 const token_contract_1 = require("../ellipticoin/token_contract");
 const { toBytesInt32, humanReadableAddress, formatBalance, } = require("../utils");
-const ed25519 = require('ed25519');
 const cbor = require("cbor");
 const nacl = require("tweetnacl");
 let default_1 = class default_1 extends clime_1.Command {

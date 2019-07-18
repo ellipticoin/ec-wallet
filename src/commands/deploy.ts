@@ -21,7 +21,6 @@ import {
   toBytesInt32,
   coerceArgs
 } from "../utils";
-const ed25519 = require('ed25519');
 
 @command({
   description: 'Deploy a Smart Contract',

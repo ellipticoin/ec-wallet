@@ -20,7 +20,6 @@ const {
   formatBalance,
 } = require("../utils");
 
-const ed25519 = require('ed25519');
 const cbor = require("cbor");
 const nacl = require("tweetnacl");
 

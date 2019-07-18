@@ -8,8 +8,8 @@ const Contract = require("../ellipticoin/contract").default;
 const Client = require("../ellipticoin/client").default;
 const yaml = require("js-yaml");
 const mkdirp = require("mkdirp");
-const ed25519 = require("ed25519");
 const crypto = require("crypto");
+const libsodium = require('libsodium-wrappers-sumo');
 const fs = require("fs");
 const promiseRetry = require('promise-retry');
 const {
@@ -41,12 +41,13 @@ export default class extends Command {
   @metadata
   async execute() {
     const seed = crypto.randomBytes(32);
-    const {publicKey, privateKey} = ed25519.MakeKeypair(seed);
+    await libsodium.ready;
+    const {publicKey, privateKey} = libsodium.crypto_sign_keypair();
     mkdirp(CONFIG_DIR);
     fs.writeFileSync(CONFIG_PATH, yaml.safeDump({
-      privateKey: privateKey.toString("base64")
+      privateKey: Buffer.from(privateKey).toString("base64")
     }));
 
-    return `Initialization done. Your elipticoin address is ${publicKey.toString("base64")}`
+    return `Initialization done. Your elipticoin address is ${Buffer.from(publicKey).toString("base64")}`
   }
 }
