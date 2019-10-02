@@ -1,5 +1,9 @@
+const _ = require("lodash");
+const cbor = require("cbor");
+const crypto = require("crypto");
 var Long = require("long");
 const BigNumber = require('bignumber.js');
+import TokenContract from "./ellipticoin/token_contract";
 const {
   WORDS_FILE_PATH
 } = require("./constants");
@@ -18,6 +22,18 @@ export function fromBytesInt32 (buffer) {
     var view = new DataView(arr);
     buffer.forEach((value, index) => view.setUint8(index, value));
     return view.getUint32(0, true);
+}
+
+export function transactionHash(transaction) {
+  return objectHash(_.omit(transaction, ["return_code", "return_value", "block_hash"]))
+}
+
+export function objectHash(object) {
+  return sha256(cbor.encode(object))
+}
+
+function sha256(message) {
+  return crypto.createHash('sha256').update(message, 'utf8').digest()
 }
 
 export function formatBalance(balance) {
@@ -52,8 +68,12 @@ export async function coerceArgs(client, args) {
   return Promise.all(args.map(async (arg) => {
     if(arg.match(ADDRESS_REGEXP)) {
       return await client.resolveAddress(arg);
+    } else if (arg.startsWith("base64:")){
+      return new Buffer(arg.slice(7), "base64");
+    } else if (!isNaN(arg)){
+      return +arg
     } else {
-      return JSON.parse(arg);
+      return arg;
     }
   }))
 }
@@ -98,4 +118,16 @@ export function base64url(bytes) {
     .toString("base64")
     .replace(/\+/g, "-")
     .replace(/\//g, "_");
+}
+
+export function tokenContractFromString(tokenString) {
+  let tokens = {
+    "EC": new TokenContract(new Buffer(32), "BaseToken")
+  }
+  if(tokens[tokenString]) {
+    return tokens[tokenString];
+  } else {
+    let [address, contractName] = tokenString.split(":");
+    return new TokenContract(new Buffer(address, "base64"), contractName)
+  }
 }

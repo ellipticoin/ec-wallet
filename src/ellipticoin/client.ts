@@ -19,6 +19,9 @@ const nacl = require("tweetnacl");
 const fs = require("fs");
 const yaml = require("js-yaml");
 const path = require('path');
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 export default class Client {
   privateKey: Buffer;
@@ -98,10 +101,13 @@ export default class Client {
     args=[]
   ) {
     const body = {
-      contract_address: contractAddress,
+      contract_address: Buffer.concat([
+        contractAddress,
+        Buffer.from(contractName)
+      ]),
       sender: await this.publicKey(),
       nonce: 0,
-      contract_name: contractName,
+      gas_limit: 100000000,
       function: func,
       arguments: args,
     };
@@ -127,6 +133,30 @@ export default class Client {
     }).catch((error) => {
       throw `Contract error: ${error}`;
     });
+  }
+
+  async waitForTransactionToBeMined(transactionHash, tries = 600) {
+      try {
+        return await this.getTransaction(transactionHash);
+      } catch (err) {
+        if (tries == 1) throw new Error("Transaction too too long to be mined");
+        await sleep(500)
+        return await this.waitForTransactionToBeMined(transactionHash, tries - 1);
+      }
+  }
+
+  async getTransaction(
+    transactionHash,
+  ) {
+    return fetch(this.edgeServer() + "/transactions/" + base64url(transactionHash)).then(async (response) => {
+
+      let arrayBuffer = await response.arrayBuffer();
+      if(response.status == 404) {
+        throw new Error("Transaction not found")
+      } else {
+        return cbor.decode(Buffer.from(arrayBuffer))
+      }
+      });
   }
 
   async getMemory(

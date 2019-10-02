@@ -15,13 +15,17 @@ import {
 import Client from "../ellipticoin/client";
 import TokenContract from "../ellipticoin/token_contract";
 const {
+  tokenContractFromString,
   toBytesInt32,
   humanReadableAddress,
   formatBalance,
+  transactionHash,
 } = require("../utils");
 
 const cbor = require("cbor");
 const nacl = require("tweetnacl");
+const retry = require("async-retry");
+const ora = require('ora');
 
 @command({
   description: 'Get account balances',
@@ -46,22 +50,16 @@ export default class extends Command {
   ) {
     const client = Client.fromConfig();
     let addressBuffer = new Buffer(address, "base64")
+    const spinner = ora('Waiting for transaction to be mined').start();
     let tokenContract = tokenContractFromString(token);
     tokenContract.setClient(client);
-
-    await tokenContract.transfer(addressBuffer, amount * 10000);
-    return `Transferred ${amount} ${token} to ${addressBuffer.toString("base64")}`;
-  }
-}
-
-function tokenContractFromString(tokenString) {
-  let tokens = {
-    "EC": new TokenContract(new Buffer(32), "BaseToken")
-  }
-  if(tokens[tokenString]) {
-    return tokens[tokenString];
-  } else {
-    let [address, contractName] = tokenString.split(":");
-    return new TokenContract(new Buffer(address, "base64"), contractName)
+    let transactionHash = await tokenContract.transfer(addressBuffer, amount * 10000);
+    let transaction = await client.waitForTransactionToBeMined(transactionHash);
+    if(transaction.return_code == 0) {
+      spinner.succeed(`Mined ${transaction.hash.toString("base64")}`);
+      return `Transferred ${amount} ${token} to ${addressBuffer.toString("base64")}`;
+    } else {
+      spinner.fail(`Smart contract error: ${transaction.return_value}`);
+    }
   }
 }

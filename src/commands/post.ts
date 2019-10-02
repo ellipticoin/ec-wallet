@@ -12,6 +12,7 @@ const {
   coerceArgs,
   fromBytesInt32,
 } = require("../utils");
+const ora = require('ora');
 
 @command({
   description: 'Call a state-modifying smart contract function',
@@ -34,7 +35,7 @@ export default class extends Command {
       description: 'Function Name',
       required: true,
     })
-    method: string,
+    func: string,
     @params({
       type: String,
       description: 'Function Parameters',
@@ -45,20 +46,26 @@ export default class extends Command {
 
     let addressBuffer = await this.client.resolveAddress(address);
 
-    let result =  await  this.client.post(
+    let transactionHash =  await  this.client.post(
       await this.client.publicKey(),
       contractName,
-      method,
+      func,
       await coerceArgs(this.client, args)
     );
 
-    let output = "";
-    output += `${address}/${contractName}.${method}(${args.join(",")})`;
-
-    if(result) {
-      output += `\n=> ${result}`;
+    console.log("Posting Transaction");
+    console.log("===================");
+    console.log(`Contract Created By: ${address}`);
+    console.log(`Contract Name: ${contractName}`);
+    console.log(`Function: ${func}`);
+    console.log(`Arguments: [\n  ${args.join(",\n  ")}\n]`)
+    const spinner = ora('Waiting for transaction to be mined').start();
+    let transaction = await this.client.waitForTransactionToBeMined(transactionHash);
+    if(transaction.return_code == 0) {
+      spinner.succeed(`Mined ${transaction.hash.toString("base64")}`);
+      return `Return value ${transaction.return_value}}`;
+    } else {
+      spinner.fail(transaction.return_value);
     }
-
-    return output;
   }
 }

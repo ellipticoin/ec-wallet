@@ -16,11 +16,15 @@ import {
 } from "../constants";
 import Contract from "../ellipticoin/contract";
 import Client from "../ellipticoin/client";
+const ora = require("ora");
 const fs = require("fs");
 import {
   toBytesInt32,
   coerceArgs
 } from "../utils";
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 @command({
   description: 'Deploy a Smart Contract',
@@ -43,10 +47,18 @@ export default class extends Command {
     })
     constructorParams: string[],
   ) {
-    const client = Client.fromConfig();
-    await client.deploy(contractName, fs.readFileSync(path), await coerceArgs(client, constructorParams));
-    let key = await client.publicKey();
 
-    return `Deployed ${contractName}`;
+    console.log(`Deploying ${contractName}`)
+    const spinner = ora('Waiting for transaction to be mined').start();
+    const client = Client.fromConfig();
+    let key = await client.publicKey();
+    let transactionHash = await client.deploy(contractName, fs.readFileSync(path), await coerceArgs(client, constructorParams));
+
+    let transaction = await client.waitForTransactionToBeMined(transactionHash);
+    if(transaction.return_code == 0) {
+      spinner.succeed(`Deployed ${contractName}`);
+    } else {
+      spinner.fail(transaction.return_value);
+    }
   }
 }
