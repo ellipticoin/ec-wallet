@@ -15,7 +15,7 @@ import {
 
 } from "../constants";
 import Contract from "../ellipticoin/contract";
-import Client from "../ellipticoin/client";
+import {Client} from "ec-client";
 const ora = require("ora");
 const fs = require("fs");
 import {

@@ -5,7 +5,7 @@ import {
   param,
   params,
 } from 'clime';
-import Client from "../ellipticoin/client";
+import { Client } from "ec-client";
 const fs = require("fs");
 const {
   humanReadableAddress,
@@ -18,7 +18,7 @@ const ora = require('ora');
   description: 'Call a state-modifying smart contract function',
 })
 export default class extends Command {
-  client: Client;
+  client: any;
 
   async execute(
     @param({

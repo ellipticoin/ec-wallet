@@ -5,7 +5,6 @@ import {
   param,
   params,
 } from 'clime';
-import Client from "../ellipticoin/client";
 import TokenContract from "../ellipticoin/token_contract";
 const fs = require("fs");
 const {
@@ -15,12 +14,13 @@ const {
   fromBytesInt32,
 } = require("../utils");
 const ora = require('ora');
+const Client = require("ec-client").Client;
 
 @command({
   description: 'Call a state-modifying smart contract function',
 })
 export default class extends Command {
-  client: Client;
+  client: any;
 
   async execute(
     @param({

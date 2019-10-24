@@ -5,7 +5,7 @@ import {
   param,
   params,
 } from 'clime';
-import Client from "../ellipticoin/client";
+import { Client } from "ec-client";
 const fs = require("fs");
 const {
   humanReadableAddress,
@@ -18,7 +18,7 @@ const ora = require('ora');
   description: 'Call a state-modifying smart contract function',
 })
 export default class extends Command {
-  client: Client;
+  client: any;
 
   async execute(
     @param({
@@ -63,7 +63,9 @@ export default class extends Command {
     let transaction = await this.client.waitForTransactionToBeMined(transactionHash);
     if(transaction.return_code == 0) {
       spinner.succeed(`Mined ${transaction.hash.toString("base64")}`);
-      return `Return value ${transaction.return_value}}`;
+      if (transaction.return_value) {
+        return `Return value ${transaction.return_value}`;
+      }
     } else {
       spinner.fail(transaction.return_value);
     }

@@ -12,7 +12,7 @@ import {
   PRIVATE_KEY,
   PUBLIC_KEY,
 } from "../constants";
-import Client from "../ellipticoin/client";
+import { Client } from "ec-client";
 import TokenContract from "../ellipticoin/token_contract";
 const {
   toBytesInt32,
