@@ -50,7 +50,7 @@ export default class extends Command {
 
 function tokenContractFromString(tokenString) {
   let tokens = {
-    "EC": new TokenContract(new Buffer(32), "BaseToken")
+    "EC": new TokenContract(new Buffer(32), "System")
   }
   if(tokens[tokenString]) {
     return tokens[tokenString];

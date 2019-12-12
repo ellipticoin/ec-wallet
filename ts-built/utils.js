@@ -119,7 +119,7 @@ function base64url(bytes) {
 exports.base64url = base64url;
 function tokenContractFromString(tokenString) {
     let tokens = {
-        "EC": new token_contract_1.default(new Buffer(32), "BaseToken")
+        "EC": new token_contract_1.default(new Buffer(32), "System")
     };
     if (tokens[tokenString]) {
         return tokens[tokenString];

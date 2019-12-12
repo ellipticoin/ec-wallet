@@ -56,6 +56,7 @@ export default class extends Command {
 
     let transaction = await client.waitForTransactionToBeMined(transactionHash);
     if(transaction.return_code == 0) {
+      console.log(transaction.hash.toString("base64"))
       spinner.succeed(`Deployed ${contractName}`);
     } else {
       spinner.fail(transaction.return_value);

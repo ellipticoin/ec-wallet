@@ -31,6 +31,7 @@ let default_1 = class default_1 extends clime_1.Command {
         let transactionHash = await client.deploy(contractName, fs.readFileSync(path), await utils_1.coerceArgs(client, constructorParams));
         let transaction = await client.waitForTransactionToBeMined(transactionHash);
         if (transaction.return_code == 0) {
+            console.log(transaction.hash.toString("base64"));
             spinner.succeed(`Deployed ${contractName}`);
         }
         else {

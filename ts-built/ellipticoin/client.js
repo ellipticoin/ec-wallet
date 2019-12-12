@@ -57,6 +57,7 @@ class Client {
         return this.post(new Buffer(32), "system", "create_contract", [contractName, contractCode, params]);
     }
     async post(contractAddress, contractName, func, args = []) {
+        console.log("posting");
         const body = {
             contract_address: Buffer.concat([
                 contractAddress,
