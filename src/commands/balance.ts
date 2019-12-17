@@ -1,61 +1,50 @@
-import {
-  Command,
-  command,
-  param,
-} from 'clime';
-import {
-  BASE_CONTRACT_ADDRESS,
-  BASE_CONTRACT_NAME,
-  CONFIG_DIR,
-  CONFIG_PATH,
-  ELIPITCOIN_SEED_EDGE_SERVERS,
-  PRIVATE_KEY,
-  PUBLIC_KEY,
-} from "../constants";
-import { Client } from "ec-client";
-import TokenContract from "../ellipticoin/token_contract";
+import { Command, command, param } from "clime";
+import { Client, TokenContract } from "ec-client";
+import { CONFIG_PATH } from "../constants";
 const {
   toBytesInt32,
   humanReadableAddress,
-  formatBalance,
+  formatBalance
 } = require("../utils");
 
 const cbor = require("cbor");
 const nacl = require("tweetnacl");
 
 @command({
-  description: 'Get account balances',
+  description: "Get account balances"
 })
 export default class extends Command {
-  async execute(
+  public async execute(
     @param({
-      description: 'Token Contract Address/Ticker',
-      required: true,
+      description: "Token Contract Address/Ticker",
+      required: true
     })
     token: string,
     @param({
-      description: 'Address',
-      required: true,
+      description: "Address",
+      required: true
     })
-    address: string,
+    address: string
   ) {
-    const client = Client.fromConfig();
-    let addressBuffer = new Buffer(address, "base64")
-    let tokenContract = tokenContractFromString(token);
+    const client = Client.fromConfig(CONFIG_PATH);
+    const addressBuffer = new Buffer(address, "base64");
+    const tokenContract = tokenContractFromString(token);
     tokenContract.setClient(client);
-    let balance = await tokenContract.balanceOf(addressBuffer);
-    return `Balance of ${addressBuffer.toString("base64")}\n${formatBalance(balance)}`;
+    const balance = await tokenContract.balanceOf(addressBuffer);
+    return `Balance of ${addressBuffer.toString("base64")}\n${formatBalance(
+      balance
+    )}`;
   }
 }
 
 function tokenContractFromString(tokenString) {
-  let tokens = {
-    "EC": new TokenContract(new Buffer(32), "System")
-  }
-  if(tokens[tokenString]) {
+  const tokens = {
+    EC: new TokenContract(new Buffer(32), "System")
+  };
+  if (tokens[tokenString]) {
     return tokens[tokenString];
   } else {
-    let [address, contractName] = tokenString.split(":");
-    return new TokenContract(new Buffer(address, "base64"), contractName)
+    const [address, contractName] = tokenString.split(":");
+    return new TokenContract(new Buffer(address, "base64"), contractName);
   }
 }

@@ -14,22 +14,23 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const clime_1 = require("clime");
 const ec_client_1 = require("ec-client");
+const constants_1 = require("../constants");
 const fs = require("fs");
 const { humanReadableAddress, coerceArgs, fromBytesInt32, } = require("../utils");
-const ora = require('ora');
+const ora = require("ora");
 let default_1 = class default_1 extends clime_1.Command {
     async execute(address, contractName, func, args) {
-        this.client = ec_client_1.Client.fromConfig();
-        let addressBuffer = await this.client.resolveAddress(address);
-        let transactionHash = await this.client.post(await this.client.publicKey(), contractName, func, await coerceArgs(this.client, args));
+        const client = ec_client_1.Client.fromConfig(constants_1.CONFIG_PATH);
+        const addressBuffer = await this.client.resolveAddress(address);
+        const transactionHash = await this.client.post(await this.client.publicKey(), contractName, func, await coerceArgs(this.client, args));
         console.log("Posting Transaction");
         console.log("===================");
         console.log(`Contract Created By: ${address}`);
         console.log(`Contract Name: ${contractName}`);
         console.log(`Function: ${func}`);
         console.log(`Arguments: [\n  ${args.join(",\n  ")}\n]`);
-        const spinner = ora('Waiting for transaction to be mined').start();
-        let transaction = await this.client.waitForTransactionToBeMined(transactionHash);
+        const spinner = ora("Waiting for transaction to be mined").start();
+        const transaction = await this.client.waitForTransactionToBeMined(transactionHash);
         if (transaction.return_code == 0) {
             spinner.succeed(`Mined ${transaction.hash.toString("base64")}`);
             if (transaction.return_value) {
@@ -43,20 +44,20 @@ let default_1 = class default_1 extends clime_1.Command {
 };
 __decorate([
     __param(0, clime_1.param({
-        description: 'Address',
+        description: "Address",
         required: true,
     })),
     __param(1, clime_1.param({
-        description: 'Contract',
+        description: "Contract",
         required: true,
     })),
     __param(2, clime_1.param({
-        description: 'Function Name',
+        description: "Function Name",
         required: true,
     })),
     __param(3, clime_1.params({
         type: String,
-        description: 'Function Parameters',
+        description: "Function Parameters",
     })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, String, Array]),
@@ -64,7 +65,7 @@ __decorate([
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({
-        description: 'Call a state-modifying smart contract function',
+        description: "Call a state-modifying smart contract function",
     })
 ], default_1);
 exports.default = default_1;

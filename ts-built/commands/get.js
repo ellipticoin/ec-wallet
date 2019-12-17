@@ -14,29 +14,31 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const clime_1 = require("clime");
 const ec_client_1 = require("ec-client");
+const constants_1 = require("../constants");
 const fs = require("fs");
 const { humanReadableAddress, coerceArgs, fromBytesInt32, } = require("../utils");
-const ora = require('ora');
+const ora = require("ora");
+const base64urlToBuffer = require("base64url").toBuffer;
 let default_1 = class default_1 extends clime_1.Command {
     async execute(address, contractName, keyString) {
-        let client = ec_client_1.Client.fromConfig();
-        let addressBuffer = await client.resolveAddress(address);
-        let key = new Buffer(keyString.slice(7), "base64");
-        let value = await client.getMemory(addressBuffer, contractName, key);
-        console.log(Buffer.from(value));
+        const client = ec_client_1.Client.fromConfig(constants_1.CONFIG_PATH);
+        const addressBuffer = base64urlToBuffer(address);
+        const key = new Buffer(keyString, "base64");
+        const value = await client.getMemory(addressBuffer, contractName, key);
+        return Buffer.from(value);
     }
 };
 __decorate([
     __param(0, clime_1.param({
-        description: 'Address',
+        description: "Address",
         required: true,
     })),
     __param(1, clime_1.param({
-        description: 'Contract',
+        description: "Contract",
         required: true,
     })),
     __param(2, clime_1.param({
-        description: 'key',
+        description: "key",
         required: true,
     })),
     __metadata("design:type", Function),
@@ -45,7 +47,7 @@ __decorate([
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({
-        description: 'Call a state-modifying smart contract function',
+        description: "Call a state-modifying smart contract function",
     })
 ], default_1);
 exports.default = default_1;

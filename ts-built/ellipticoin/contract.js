@@ -12,8 +12,18 @@ class Contract {
     getMemory(key) {
         return this.client.getMemory(this.contractAddress, this.contractName, key);
     }
-    post(func, ...args) {
-        return this.client.post(this.contractAddress, this.contractName, func, ...args);
+    createTransaction(func, ...args) {
+        return {
+            contract_address: Buffer.concat([
+                this.contractAddress,
+                Buffer.from(this.contractName, "utf8")
+            ]),
+            function: func,
+            arguments: args
+        };
+    }
+    post(transaction) {
+        return this.client.post(transaction);
     }
 }
 exports.default = Contract;

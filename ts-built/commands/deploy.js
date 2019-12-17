@@ -12,45 +12,44 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const BigNumber = require('bignumber.js');
-const cbor = require("cbor");
+const base64url_1 = require("base64url");
 const clime_1 = require("clime");
 const ec_client_1 = require("ec-client");
-const ora = require("ora");
+const ora_1 = require("ora");
+const constants_1 = require("../constants");
 const fs = require("fs");
-const utils_1 = require("../utils");
 function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 let default_1 = class default_1 extends clime_1.Command {
     async execute(path, contractName, constructorParams) {
         console.log(`Deploying ${contractName}`);
-        const spinner = ora('Waiting for transaction to be mined').start();
-        const client = ec_client_1.Client.fromConfig();
-        let key = await client.publicKey();
-        let transactionHash = await client.deploy(contractName, fs.readFileSync(path), await utils_1.coerceArgs(client, constructorParams));
-        let transaction = await client.waitForTransactionToBeMined(transactionHash);
-        if (transaction.return_code == 0) {
-            console.log(transaction.hash.toString("base64"));
-            spinner.succeed(`Deployed ${contractName}`);
+        const spinner = ora_1.default("Waiting for transaction to be mined").start();
+        const client = ec_client_1.Client.fromConfig(constants_1.CONFIG_PATH);
+        const key = await client.publicKey();
+        const transaction = await client.deploy(contractName, fs.readFileSync(path), await ec_client_1.coerceArgs(client, constructorParams));
+        const completedTransaction = await client.waitForTransactionToBeMined(transaction);
+        if (completedTransaction.return_code == 0) {
+            spinner.succeed(`Deployed in transaction ${base64url_1.default(ec_client_1.transactionHash(completedTransaction))}`);
+            return `Transaction address: ${base64url_1.default(ec_client_1.toAddress(Buffer.from(await client.publicKey()), contractName))}`;
         }
         else {
-            spinner.fail(transaction.return_value);
+            spinner.fail(`Smart contract error: ${completedTransaction.return_value}`);
         }
     }
 };
 __decorate([
     __param(0, clime_1.param({
-        description: 'WASM file path',
+        description: "WASM file path",
         required: true,
     })),
     __param(1, clime_1.param({
-        description: 'Contract name',
+        description: "Contract name",
         required: true,
     })),
     __param(2, clime_1.params({
         type: String,
-        description: 'Constructor Parameters',
+        description: "Constructor Parameters",
     })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, Array]),
@@ -58,7 +57,7 @@ __decorate([
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({
-        description: 'Deploy a Smart Contract',
+        description: "Deploy a Smart Contract",
     })
 ], default_1);
 exports.default = default_1;

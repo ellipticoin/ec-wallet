@@ -4,11 +4,13 @@ const contract_1 = require("./contract");
 const utils_1 = require("../utils");
 const BALANCE_KEY = new Buffer([0]);
 class TokenContract extends contract_1.default {
-    async approve(recipientAddress, amount) {
-        return this.post("approve", [recipientAddress, amount]);
+    approve(recipientAddress, amount) {
+        let transaction = this.createTransaction("approve", recipientAddress, amount);
+        return this.client.post(transaction);
     }
-    async transfer(recipientAddress, amount) {
-        return this.post("transfer", [recipientAddress, amount]);
+    transfer(recipientAddress, amount) {
+        let transaction = this.createTransaction("transfer", recipientAddress, amount);
+        return this.client.post(transaction);
     }
     async balanceOf(address) {
         let balanceBytes = await this.getMemory(Buffer.concat([BALANCE_KEY, address]));

@@ -13,26 +13,25 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const clime_1 = require("clime");
-const fs = require("fs");
-const { tokenContractFromString, humanReadableAddress, coerceArgs, fromBytesInt32, } = require("../utils");
-const ora = require('ora');
-const Client = require("ec-client").Client;
+const ec_client_1 = require("ec-client");
+const ora_1 = require("ora");
+const constants_1 = require("../constants");
+const base64url = require("base64url").default;
+const base64urlToBuffer = require("base64url").toBuffer;
 let default_1 = class default_1 extends clime_1.Command {
     async execute(token, amount, address, contractName, func, args) {
-        let client = Client.fromConfig();
-        let addressBuffer = await client.resolveAddress(address);
-        let tokenContract = tokenContractFromString(token);
+        const client = ec_client_1.Client.fromConfig(constants_1.CONFIG_PATH);
+        const addressBuffer = base64urlToBuffer(address);
+        const tokenContract = ec_client_1.tokenContractFromString(token);
         tokenContract.setClient(client);
-        let transactionHash = await tokenContract.approve(addressBuffer, amount * 10000);
-        console.log("Approving Payment");
-        let spinner = ora('Waiting for transaction to be mined').start();
-        let transaction = await client.waitForTransactionToBeMined(transactionHash);
-        if (transaction.return_code == 0) {
-            spinner.succeed(`Mined ${transaction.hash.toString("base64")}`);
-            `Return value ${transaction.return_value}}`;
+        const spinner = ora_1.default("Waiting for transaction to be mined").start();
+        let transaction = await tokenContract.approve(addressBuffer, amount * 10000);
+        let completedTransaction = await client.waitForTransactionToBeMined(transaction);
+        if (completedTransaction.return_code == 0) {
+            spinner.succeed(`Approved transfer: ${base64url(ec_client_1.objectHash(transaction))}`);
         }
         else {
-            spinner.fail(transaction.return_value);
+            spinner.fail(`Smart contract error: ${completedTransaction.return_value}`);
         }
         console.log("Posting Transaction");
         console.log("===================");
@@ -40,46 +39,45 @@ let default_1 = class default_1 extends clime_1.Command {
         console.log(`Contract Name: ${contractName}`);
         console.log(`Function: ${func}`);
         console.log(`Arguments: [\n  ${args.join(",\n  ")}\n]`);
-        transactionHash = await client.post(await client.publicKey(), contractName, func, await coerceArgs(this.client, args));
-        transaction = await client.waitForTransactionToBeMined(transactionHash);
+        const contract = new ec_client_1.Contract(addressBuffer, contractName);
+        transaction = contract.createTransaction(func, ...(await ec_client_1.coerceArgs(client, args)));
         spinner.start();
-        if (transaction.return_code == 0) {
-            spinner.succeed(`Mined ${transaction.hash.toString("base64")}`);
-            if (transaction.return_value) {
-                console.log(`Return value ${transaction.return_value}}`);
-            }
+        const postedTransaction = await client.post(transaction);
+        completedTransaction = await client.waitForTransactionToBeMined(postedTransaction);
+        if (completedTransaction.return_code == 0) {
+            spinner.succeed(`Mined transaction: ${base64url(ec_client_1.objectHash(transaction))}`);
         }
         else {
-            spinner.fail(transaction.return_value);
+            spinner.fail(`Smart contract error: ${completedTransaction.return_value}`);
         }
     }
 };
 __decorate([
     __param(0, clime_1.param({
         type: String,
-        description: 'Token',
+        description: "Token",
         required: true,
     })),
     __param(1, clime_1.param({
         type: String,
-        description: 'Amount',
+        description: "Amount",
         required: true,
     })),
     __param(2, clime_1.param({
-        description: 'Address',
+        description: "Address",
         required: true,
     })),
     __param(3, clime_1.param({
-        description: 'Contract',
+        description: "Contract",
         required: true,
     })),
     __param(4, clime_1.param({
-        description: 'Function Name',
+        description: "Function Name",
         required: true,
     })),
     __param(5, clime_1.params({
         type: String,
-        description: 'Function Parameters',
+        description: "Function Parameters",
     })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Number, String, String, String, Array]),
@@ -87,7 +85,7 @@ __decorate([
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({
-        description: 'Call a state-modifying smart contract function',
+        description: "Call a state-modifying smart contract function",
     })
 ], default_1);
 exports.default = default_1;

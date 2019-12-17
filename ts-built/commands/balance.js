@@ -14,27 +14,27 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const clime_1 = require("clime");
 const ec_client_1 = require("ec-client");
-const token_contract_1 = require("../ellipticoin/token_contract");
+const constants_1 = require("../constants");
 const { toBytesInt32, humanReadableAddress, formatBalance, } = require("../utils");
 const cbor = require("cbor");
 const nacl = require("tweetnacl");
 let default_1 = class default_1 extends clime_1.Command {
     async execute(token, address) {
-        const client = ec_client_1.Client.fromConfig();
-        let addressBuffer = new Buffer(address, "base64");
-        let tokenContract = tokenContractFromString(token);
+        const client = ec_client_1.Client.fromConfig(constants_1.CONFIG_PATH);
+        const addressBuffer = new Buffer(address, "base64");
+        const tokenContract = tokenContractFromString(token);
         tokenContract.setClient(client);
-        let balance = await tokenContract.balanceOf(addressBuffer);
+        const balance = await tokenContract.balanceOf(addressBuffer);
         return `Balance of ${addressBuffer.toString("base64")}\n${formatBalance(balance)}`;
     }
 };
 __decorate([
     __param(0, clime_1.param({
-        description: 'Token Contract Address/Ticker',
+        description: "Token Contract Address/Ticker",
         required: true,
     })),
     __param(1, clime_1.param({
-        description: 'Address',
+        description: "Address",
         required: true,
     })),
     __metadata("design:type", Function),
@@ -43,20 +43,20 @@ __decorate([
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({
-        description: 'Get account balances',
+        description: "Get account balances",
     })
 ], default_1);
 exports.default = default_1;
 function tokenContractFromString(tokenString) {
-    let tokens = {
-        "EC": new token_contract_1.default(new Buffer(32), "System")
+    const tokens = {
+        EC: new ec_client_1.TokenContract(new Buffer(32), "System"),
     };
     if (tokens[tokenString]) {
         return tokens[tokenString];
     }
     else {
-        let [address, contractName] = tokenString.split(":");
-        return new token_contract_1.default(new Buffer(address, "base64"), contractName);
+        const [address, contractName] = tokenString.split(":");
+        return new ec_client_1.TokenContract(new Buffer(address, "base64"), contractName);
     }
 }
 //# sourceMappingURL=balance.js.map

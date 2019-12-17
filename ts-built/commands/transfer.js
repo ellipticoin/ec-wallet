@@ -14,40 +14,39 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const clime_1 = require("clime");
 const ec_client_1 = require("ec-client");
-const { tokenContractFromString, toBytesInt32, humanReadableAddress, formatBalance, transactionHash, } = require("../utils");
-const cbor = require("cbor");
-const nacl = require("tweetnacl");
-const retry = require("async-retry");
-const ora = require('ora');
+const ora_1 = require("ora");
+const constants_1 = require("../constants");
+const base64url = require("base64url").default;
+const base64urlToBuffer = require("base64url").toBuffer;
 let default_1 = class default_1 extends clime_1.Command {
     async execute(token, address, amount) {
-        const client = ec_client_1.Client.fromConfig();
-        let addressBuffer = new Buffer(address, "base64");
-        const spinner = ora('Waiting for transaction to be mined').start();
-        let tokenContract = tokenContractFromString(token);
+        const client = ec_client_1.Client.fromConfig(constants_1.CONFIG_PATH);
+        const addressBuffer = base64urlToBuffer(address);
+        const spinner = ora_1.default("Waiting for transaction to be mined").start();
+        const tokenContract = ec_client_1.tokenContractFromString(token);
         tokenContract.setClient(client);
-        let transactionHash = await tokenContract.transfer(addressBuffer, amount * 10000);
-        let transaction = await client.waitForTransactionToBeMined(transactionHash);
-        if (transaction.return_code == 0) {
-            spinner.succeed(`Mined ${transaction.hash.toString("base64")}`);
-            return `Transferred ${amount} ${token} to ${addressBuffer.toString("base64")}`;
+        const transaction = await tokenContract.transfer(addressBuffer, amount * 10000);
+        const completedTransaction = await client.waitForTransactionToBeMined(transaction);
+        if (completedTransaction.return_code == 0) {
+            spinner.succeed(`Mined ${base64url(ec_client_1.objectHash(transaction))}`);
+            return `Transferred ${amount} ${token} to ${base64url(addressBuffer)}`;
         }
         else {
-            spinner.fail(`Smart contract error: ${transaction.return_value}`);
+            spinner.fail(`Smart contract error: ${completedTransaction.return_value}`);
         }
     }
 };
 __decorate([
     __param(0, clime_1.param({
-        description: 'Token Contract Address/Ticker',
+        description: "Token Contract Address/Ticker",
         required: true,
     })),
     __param(1, clime_1.param({
-        description: 'Address',
+        description: "Address",
         required: true,
     })),
     __param(2, clime_1.param({
-        description: 'Amount',
+        description: "Amount",
         required: true,
     })),
     __metadata("design:type", Function),
@@ -56,7 +55,7 @@ __decorate([
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({
-        description: 'Get account balances',
+        description: "Get account balances",
     })
 ], default_1);
 exports.default = default_1;

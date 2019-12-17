@@ -1,6 +1,6 @@
 {
   "name": "ec-wallet",
-  "version": "0.4.13",
+  "version": "0.4.15",
   "description": "The Ellipticoin Wallet",
   "main": "index.js",
   "bin": {
@@ -14,12 +14,13 @@
   "dependencies": {
     "@types/node": "^9.4.7",
     "async-retry": "^1.2.3",
+    "base64url": "^3.0.1",
     "bignumber.js": "^6.0.0",
     "borc": "^2.0.3",
     "cbor": "^5.0.1",
     "clime": "^0.5.9",
     "command-exists": "^1.2.6",
-    "ec-client": "../js-ec-client",
+    "ec-client": "^0.0.4",
     "js-yaml": "^3.13.1",
     "libsodium-wrappers-sumo": "^0.7.3",
     "lodash": "^4.17.11",
