@@ -56,28 +56,28 @@ __decorate([
     __param(0, clime_1.param({
         type: String,
         description: "Token",
-        required: true,
+        required: true
     })),
     __param(1, clime_1.param({
         type: String,
         description: "Amount",
-        required: true,
+        required: true
     })),
     __param(2, clime_1.param({
         description: "Address",
-        required: true,
+        required: true
     })),
     __param(3, clime_1.param({
         description: "Contract",
-        required: true,
+        required: true
     })),
     __param(4, clime_1.param({
         description: "Function Name",
-        required: true,
+        required: true
     })),
     __param(5, clime_1.params({
         type: String,
-        description: "Function Parameters",
+        description: "Function Parameters"
     })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Number, String, String, String, Array]),
@@ -85,7 +85,7 @@ __decorate([
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({
-        description: "Call a state-modifying smart contract function",
+        description: "Call a state-modifying smart contract function"
     })
 ], default_1);
 exports.default = default_1;

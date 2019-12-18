@@ -19,7 +19,7 @@ const ora_1 = require("ora");
 const constants_1 = require("../constants");
 const fs = require("fs");
 function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 let default_1 = class default_1 extends clime_1.Command {
     async execute(path, contractName, constructorParams) {
@@ -41,15 +41,15 @@ let default_1 = class default_1 extends clime_1.Command {
 __decorate([
     __param(0, clime_1.param({
         description: "WASM file path",
-        required: true,
+        required: true
     })),
     __param(1, clime_1.param({
         description: "Contract name",
-        required: true,
+        required: true
     })),
     __param(2, clime_1.params({
         type: String,
-        description: "Constructor Parameters",
+        description: "Constructor Parameters"
     })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, Array]),
@@ -57,7 +57,7 @@ __decorate([
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({
-        description: "Deploy a Smart Contract",
+        description: "Deploy a Smart Contract"
     })
 ], default_1);
 exports.default = default_1;

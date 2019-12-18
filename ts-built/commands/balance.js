@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const clime_1 = require("clime");
 const ec_client_1 = require("ec-client");
 const constants_1 = require("../constants");
-const { toBytesInt32, humanReadableAddress, formatBalance, } = require("../utils");
+const { toBytesInt32, humanReadableAddress, formatBalance } = require("../utils");
 const cbor = require("cbor");
 const nacl = require("tweetnacl");
 let default_1 = class default_1 extends clime_1.Command {
@@ -31,11 +31,11 @@ let default_1 = class default_1 extends clime_1.Command {
 __decorate([
     __param(0, clime_1.param({
         description: "Token Contract Address/Ticker",
-        required: true,
+        required: true
     })),
     __param(1, clime_1.param({
         description: "Address",
-        required: true,
+        required: true
     })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),
@@ -43,13 +43,13 @@ __decorate([
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({
-        description: "Get account balances",
+        description: "Get account balances"
     })
 ], default_1);
 exports.default = default_1;
 function tokenContractFromString(tokenString) {
     const tokens = {
-        EC: new ec_client_1.TokenContract(new Buffer(32), "System"),
+        EC: new ec_client_1.TokenContract(new Buffer(32), "System")
     };
     if (tokens[tokenString]) {
         return tokens[tokenString];

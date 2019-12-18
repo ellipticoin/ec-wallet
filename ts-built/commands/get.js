@@ -16,7 +16,7 @@ const clime_1 = require("clime");
 const ec_client_1 = require("ec-client");
 const constants_1 = require("../constants");
 const fs = require("fs");
-const { humanReadableAddress, coerceArgs, fromBytesInt32, } = require("../utils");
+const { humanReadableAddress, coerceArgs, fromBytesInt32 } = require("../utils");
 const ora = require("ora");
 const base64urlToBuffer = require("base64url").toBuffer;
 let default_1 = class default_1 extends clime_1.Command {
@@ -31,15 +31,15 @@ let default_1 = class default_1 extends clime_1.Command {
 __decorate([
     __param(0, clime_1.param({
         description: "Address",
-        required: true,
+        required: true
     })),
     __param(1, clime_1.param({
         description: "Contract",
-        required: true,
+        required: true
     })),
     __param(2, clime_1.param({
         description: "key",
-        required: true,
+        required: true
     })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, String]),
@@ -47,7 +47,7 @@ __decorate([
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([
     clime_1.command({
-        description: "Call a state-modifying smart contract function",
+        description: "Call a state-modifying smart contract function"
     })
 ], default_1);
 exports.default = default_1;
