@@ -24,8 +24,7 @@ let default_1 = class default_1 extends clime_1.Command {
         const client = ec_client_1.Client.fromConfig(constants_1.CONFIG_PATH);
         const addressBuffer = base64urlToBuffer(address);
         const key = new Buffer(keyString, "base64");
-        const value = await client.getMemory(addressBuffer, contractName, key);
-        return Buffer.from(value);
+        return await client.getMemory(addressBuffer, contractName, key);
     }
 };
 __decorate([

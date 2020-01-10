@@ -1,5 +1,5 @@
 import base64url from "base64url";
-import { Command, command, param, params } from "clime";
+import { Command, command, param, params, option, Options } from "clime";
 import { Client, coerceArgs, toAddress, transactionHash } from "ec-client";
 import ora from "ora";
 import { CONFIG_PATH } from "../constants";
@@ -7,6 +7,14 @@ const fs = require("fs");
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export class CommandOptions extends Options {
+  @option({
+    flag: 'h',
+    description: 'the host to post to',
+  })
+  host: String;
 }
 
 @command({
@@ -28,7 +36,8 @@ export default class extends Command {
       type: String,
       description: "Constructor Parameters"
     })
-    constructorParams: string[]
+    constructorParams: string[],
+    options: CommandOptions,
   ) {
     console.log(`Deploying ${contractName}`);
     const spinner = ora("Waiting for transaction to be mined").start();

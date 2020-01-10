@@ -21,8 +21,18 @@ const fs = require("fs");
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+class CommandOptions extends clime_1.Options {
+}
+__decorate([
+    clime_1.option({
+        flag: 'h',
+        description: 'the host to post to',
+    }),
+    __metadata("design:type", String)
+], CommandOptions.prototype, "host", void 0);
+exports.CommandOptions = CommandOptions;
 let default_1 = class default_1 extends clime_1.Command {
-    async execute(path, contractName, constructorParams) {
+    async execute(path, contractName, constructorParams, options) {
         console.log(`Deploying ${contractName}`);
         const spinner = ora_1.default("Waiting for transaction to be mined").start();
         const client = ec_client_1.Client.fromConfig(constants_1.CONFIG_PATH);
@@ -52,7 +62,7 @@ __decorate([
         description: "Constructor Parameters"
     })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, Array]),
+    __metadata("design:paramtypes", [String, String, Array, CommandOptions]),
     __metadata("design:returntype", Promise)
 ], default_1.prototype, "execute", null);
 default_1 = __decorate([

@@ -36,7 +36,6 @@ export default class extends Command {
     const client = Client.fromConfig(CONFIG_PATH);
     const addressBuffer = base64urlToBuffer(address);
     const key = new Buffer(keyString, "base64");
-    const value = await client.getMemory(addressBuffer, contractName, key);
-    return Buffer.from(value);
+    return await client.getMemory(addressBuffer, contractName, key);
   }
 }
